@@ -1,0 +1,83 @@
+﻿using Automation.Models;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
+using System.Web.Mvc;
+
+namespace Automation.Controllers
+{
+    public class DefaultController : Controller
+    {
+        // GET: Default
+        private IRepository.IRepository repository;
+        public DefaultController()
+        {
+            repository = new Repository.Repository(new ConnectionString());
+        }
+        public ActionResult Index()
+        {
+            string DATES = DateTime.Now.ToString("MM_yyyy");
+            string d1 = "2018年3月3日";
+            string d2 = "2018-3-1";
+            string d3 = "2018年03月";
+            bool b1 = HttpUtil.IsDateTime(d1);
+            bool b2 = HttpUtil.IsDateTime(d2);
+            bool b3 = HttpUtil.IsDateTime(d3);
+          //  LogUtil.Error("AutoJob.ShortUrl", string.Format("{0}，生成短链接失败：{1}", DATES, b1));
+            //List<string> mobiles = new List<string>() { "18662490220", "13621973106", "18601797523", "18621727650", "18621003313" };
+            //foreach (string m in mobiles)
+            //{
+            //    Models.Auto_Offer offer = new Auto_Offer();
+            //    offer.Language = "CN";
+            //    offer.phone_no = m;
+            //    offer.ShortUrl = "http://lc.co/"+m;
+            //    offer.CommID = "CN_TEST";
+            //    repository.Add<Models.Auto_Offer>(offer);
+            //}
+            //repository.UnitOfWork.SaveChanges();
+            //var list = repository.GetQuery<Models.Auto_Offer>(x => x.Language.Equals("CN",StringComparison.OrdinalIgnoreCase));
+            //var list2 = repository.GetAll<Models.TD_List>();
+            //var xx = from s in list where !list2.Any(ss => ss.Mobile.Equals(s.phone_no)) select s;
+            //DateTime time = DateTime.Now;
+            //long smsId = long.Parse(time.ToString("yyyyMMddHHmmss"));
+            //string title = "Auto_"+time.ToShortDateString();
+            //foreach (var item in xx)
+            //{
+            //    Models.YM_SendList send = new YM_SendList();
+            //    send.Send_AccountId = 4;
+            //    send.Send_Batch = 1;
+            //    send.Send_CheckId = "Auto";
+            //    send.Send_CheckStatus = true;
+            //    send.Send_CheckTime = time;
+            //    send.Send_Contents = "";
+            //    send.Send_CreateId = 1;
+            //    send.Send_CreateTime = time;
+            //    send.Send_DataStatus = 1;
+            //    send.Send_Flag = 1;
+            //    send.Send_IsOver = true;
+            //    send.Send_IsPersonalized = true;
+            //    send.Send_IsTD = false;
+            //    send.Send_Mobile = item.phone_no;
+            //    send.Send_NeedReply = false;
+            //    send.Send_QuestionId = 0;
+            //    send.Send_ReplyFlag = false;
+            //    send.Send_ReplyId = 0;
+            //    send.Send_Result="";
+            //    send.Send_SMSID = smsId;
+            //    send.Send_StartFlag = 0;
+            //    send.Send_Status = false;
+            //    send.Send_SubmitResult = "";
+            //    send.Send_Test = false;
+            //    send.Send_Time = time;
+            //    send.Send_Title = title;
+            //    repository.Add<Models.YM_SendList>(send);
+
+            //}
+            //repository.UnitOfWork.SaveChanges();
+            return View();
+        }
+    }
+}

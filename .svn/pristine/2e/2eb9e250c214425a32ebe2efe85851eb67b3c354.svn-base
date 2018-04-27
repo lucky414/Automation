@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Optimization;
+using System.Web.Routing;
+
+namespace Automation
+{
+    public class MvcApplication : System.Web.HttpApplication
+    {
+        protected void Application_Start()
+        {
+            AreaRegistration.RegisterAllAreas();
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+           // FluentScheduler.JobManager.Initialize(new ScheduleTask());
+            Models.LogUtil.Error("Application_Start", "Application Start");
+        }
+        protected void Application_End(object sender, EventArgs e)
+        {
+            // string strUrl = System.Configuration.ConfigurationManager.AppSettings["SelfAddress"];//本程序部署地址  
+            string strUrl = "http://lcauto.lead2win.com.cn/Default/Index";
+            System.Threading.Thread.Sleep(1000);  
+
+            System.Net.HttpWebRequest myHttpWebRequest = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(strUrl);
+
+            System.Net.HttpWebResponse myHttpWebResponse = (System.Net.HttpWebResponse)myHttpWebRequest.GetResponse();
+
+            System.IO.Stream receiveStream = myHttpWebResponse.GetResponseStream();//得到回写的字节流 
+
+            Models.LogUtil.Error("Application_End", "Application End");
+        }
+    }
+}

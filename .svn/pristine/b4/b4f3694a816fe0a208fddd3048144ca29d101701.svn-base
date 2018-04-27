@@ -1,0 +1,32 @@
+﻿using Automation.Models;
+using FluentScheduler;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Automation
+{
+    public class ScheduleTask : Registry
+    {
+      //  private IRepository.IRepository repository;
+        //public static 
+        public ScheduleTask()
+        {
+            //repository = new Repository.Repository(new ConnectionString());
+            string hours = System.Configuration.ConfigurationManager.AppSettings["RunTime"];
+            int hh = Int32.Parse(hours.Split(':')[0]);
+            int mm= Int32.Parse(hours.Split(':')[1]);
+            Schedule<AutoJob>().ToRunNow().AndEvery(1).Days().At(hh, mm);
+            //Schedule<AutoJob>().ToRunNow().AndEvery(30).Minutes().Between(16,10,22,10);
+            //Schedule<AutoJob>().ToRunNow().AndEvery(2).Minutes();
+            //Schedule(() =>
+            //{
+
+            //    repository.Add<Models.LC_ExceptionLog>(new Models.LC_ExceptionLog() { Log_Descr = "Date:"+DateTime.Now, Log_Name = "Test", Log_Time = DateTime.Now, Log_Type = "Job", Log_Url = "ScheduleTask" });
+            //    repository.UnitOfWork.SaveChanges();
+
+            //}).ToRunEvery(2).Minutes();
+        }
+    }
+}

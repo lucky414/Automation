@@ -1,0 +1,507 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Models.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Auto_Offer">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Vip_no" Type="nvarchar" MaxLength="255" />
+          <Property Name="Name" Type="nvarchar" MaxLength="255" />
+          <Property Name="phone_no" Type="nvarchar" MaxLength="255" />
+          <Property Name="Channel" Type="nvarchar" MaxLength="255" />
+          <Property Name="Language" Type="nvarchar" MaxLength="255" />
+          <Property Name="Offer" Type="nvarchar" MaxLength="255" />
+          <Property Name="Region" Type="nvarchar" MaxLength="255" />
+          <Property Name="CommID" Type="nvarchar" MaxLength="255" />
+          <Property Name="Date" Type="nvarchar" MaxLength="255" />
+          <Property Name="URL" Type="nvarchar" MaxLength="500" />
+          <Property Name="Flag" Type="nvarchar" MaxLength="255" />
+          <Property Name="OperateStatus" Type="int" />
+          <Property Name="ShortUrl" Type="nvarchar" MaxLength="255" />
+          <Property Name="Td" Type="bit" />
+          <Property Name="Copy" Type="nvarchar" MaxLength="500" />
+          <Property Name="AccountId" Type="int" />
+        </EntityType>
+        <EntityType Name="Auto_SendLog">
+          <Key>
+            <PropertyRef Name="LogId" />
+          </Key>
+          <Property Name="LogId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LogName" Type="nvarchar" MaxLength="50" />
+          <Property Name="LogType" Type="nvarchar" MaxLength="50" />
+          <Property Name="LogStatus" Type="int" />
+          <Property Name="LogTime" Type="datetime" />
+        </EntityType>
+        <EntityType Name="LC_AUTOFILE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="vip_no" Type="nvarchar" MaxLength="20" />
+          <Property Name="card_type" Type="nvarchar" MaxLength="20" />
+          <Property Name="title" Type="nvarchar" MaxLength="50" />
+          <Property Name="first_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="last_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="print_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="phone_country_code" Type="nvarchar" MaxLength="20" />
+          <Property Name="phone_area_code" Type="nvarchar" MaxLength="20" />
+          <Property Name="phone_no" Type="nvarchar" MaxLength="20" />
+          <Property Name="cust_type" Type="nvarchar" MaxLength="20" />
+          <Property Name="recent_store" Type="nvarchar" MaxLength="100" />
+          <Property Name="comm_ID" Type="nvarchar" MaxLength="20" />
+          <Property Name="URL" Type="nvarchar" MaxLength="1000" />
+          <Property Name="SEEDING" Type="nvarchar" MaxLength="10" />
+          <Property Name="Expired_date" Type="nvarchar" MaxLength="20" />
+          <Property Name="FILENAME" Type="nvarchar" MaxLength="50" />
+          <Property Name="Short_Url" Type="nvarchar" MaxLength="50" />
+          <Property Name="CreateDate" Type="datetime" />
+          <Property Name="Copy" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="LC_ExceptionLog">
+          <Key>
+            <PropertyRef Name="Log_Id" />
+          </Key>
+          <Property Name="Log_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Log_Name" Type="nvarchar" MaxLength="50" />
+          <Property Name="Log_Url" Type="nvarchar" MaxLength="50" />
+          <Property Name="Log_Descr" Type="nvarchar" MaxLength="500" />
+          <Property Name="Log_Type" Type="nvarchar" MaxLength="20" />
+          <Property Name="Log_Time" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LC_OperateLog">
+          <Key>
+            <PropertyRef Name="Operate_Id" />
+          </Key>
+          <Property Name="Operate_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Operate_Type" Type="nvarchar" MaxLength="10" />
+          <Property Name="Operate_Name" Type="nvarchar" MaxLength="50" />
+          <Property Name="Operate_FileName" Type="nvarchar" MaxLength="50" />
+          <Property Name="Operate_Time" Type="datetime" Nullable="false" />
+          <Property Name="Operate_Remark" Type="nvarchar" MaxLength="500" />
+          <Property Name="Operate_Status" Type="int" />
+        </EntityType>
+        <EntityType Name="LC_SHORTURL">
+          <Key>
+            <PropertyRef Name="URL_ID" />
+          </Key>
+          <Property Name="URL_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="URL_SHORT" Type="varchar" MaxLength="20" />
+          <Property Name="URL_LONG" Type="varchar" MaxLength="500" />
+          <Property Name="URL_MOBILE" Type="varchar" MaxLength="20" />
+          <Property Name="URL_VIPNO" Type="varchar" MaxLength="20" />
+          <Property Name="URL_PRINTNAME" Type="nvarchar" MaxLength="50" />
+          <Property Name="URL_DATE" Type="nvarchar" MaxLength="20" />
+          <Property Name="URL_COPY" Type="nvarchar" MaxLength="500" />
+          <Property Name="URL_SENDTIME" Type="datetime" />
+          <Property Name="URL_CREATETIME" Type="datetime" />
+          <Property Name="URL_FILENAME" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="TD_List">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Mobile" Type="nvarchar" MaxLength="20" />
+          <Property Name="Conetents" Type="nvarchar" MaxLength="200" />
+          <Property Name="Dates" Type="datetime" />
+          <Property Name="Types" Type="nvarchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="YM_SendList">
+          <Key>
+            <PropertyRef Name="Send_Id" />
+          </Key>
+          <Property Name="Send_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Send_Title" Type="nvarchar" MaxLength="100" />
+          <Property Name="Send_Mobile" Type="nvarchar" MaxLength="20" />
+          <Property Name="Send_Contents" Type="nvarchar" MaxLength="1000" />
+          <Property Name="Send_TextID" Type="int" />
+          <Property Name="Send_Time" Type="datetime" />
+          <Property Name="Send_Status" Type="bit" />
+          <Property Name="Send_AccountId" Type="int" />
+          <Property Name="Send_NeedReply" Type="bit" />
+          <Property Name="Send_ReplyId" Type="int" />
+          <Property Name="Send_ReplyFlag" Type="bit" />
+          <Property Name="Send_Result" Type="nvarchar" MaxLength="1000" />
+          <Property Name="Send_Flag" Type="int" />
+          <Property Name="Send_SMSID" Type="bigint" />
+          <Property Name="Send_Test" Type="bit" />
+          <Property Name="Send_ReplyTemplateId" Type="int" />
+          <Property Name="Send_IsTD" Type="bit" />
+          <Property Name="Send_CreateId" Type="int" />
+          <Property Name="Send_CreateTime" Type="datetime" />
+          <Property Name="Send_UpdateId" Type="int" />
+          <Property Name="Send_UpdateDate" Type="datetime" />
+          <Property Name="Send_DataStatus" Type="int" />
+          <Property Name="Send_IsPersonalized" Type="bit" />
+          <Property Name="Send_Batch" Type="int" />
+          <Property Name="Send_ApiID" Type="nvarchar" MaxLength="50" />
+          <Property Name="Send_ReplyIsTrue" Type="bit" />
+          <Property Name="Send_ReportDate" Type="datetime" />
+          <Property Name="Send_CheckStatus" Type="bit" />
+          <Property Name="Send_CheckId" Type="nvarchar" MaxLength="20" />
+          <Property Name="Send_CheckTime" Type="datetime" />
+          <Property Name="Send_QuestionId" Type="int" />
+          <Property Name="Send_IsOver" Type="bit" Nullable="false" />
+          <Property Name="Send_StartFlag" Type="int" Nullable="false" />
+          <Property Name="Send_SubmitResult" Type="nvarchar" MaxLength="50" />
+          <Property Name="Seeding" Type="varchar" MaxLength="10" />
+        </EntityType>
+        <EntityContainer Name="ModelsStoreContainer">
+          <EntitySet Name="Auto_Offer" EntityType="Self.Auto_Offer" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Auto_SendLog" EntityType="Self.Auto_SendLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LC_AUTOFILE" EntityType="Self.LC_AUTOFILE" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LC_ExceptionLog" EntityType="Self.LC_ExceptionLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LC_OperateLog" EntityType="Self.LC_OperateLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LC_SHORTURL" EntityType="Self.LC_SHORTURL" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TD_List" EntityType="Self.TD_List" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="YM_SendList" EntityType="Self.YM_SendList" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Models" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="LC_ExceptionLog">
+          <Key>
+            <PropertyRef Name="Log_Id" />
+          </Key>
+          <Property Name="Log_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Log_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Log_Url" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Log_Descr" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Log_Type" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Log_Time" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="LC_OperateLog">
+          <Key>
+            <PropertyRef Name="Operate_Id" />
+          </Key>
+          <Property Name="Operate_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Operate_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Operate_FileName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Operate_Time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Operate_Type" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="Operate_Status" Type="Int32" />
+          <Property Name="Operate_Remark" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityContainer Name="ConnectionString" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="LC_ExceptionLog" EntityType="Self.LC_ExceptionLog" />
+          <EntitySet Name="LC_OperateLog" EntityType="Self.LC_OperateLog" />
+          <EntitySet Name="YM_SendList" EntityType="Models.YM_SendList" />
+          <EntitySet Name="Auto_Offer" EntityType="Models.Auto_Offer" />
+          <EntitySet Name="Auto_SendLog" EntityType="Models.Auto_SendLog" />
+          <EntitySet Name="TD_List" EntityType="Models.TD_List" />
+          <EntitySet Name="LC_AUTOFILE" EntityType="Models.LC_AUTOFILE" />
+          <EntitySet Name="LC_SHORTURL" EntityType="Models.LC_SHORTURL" />
+        </EntityContainer>
+        <EntityType Name="YM_SendList">
+          <Key>
+            <PropertyRef Name="Send_Id" />
+          </Key>
+          <Property Name="Send_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Send_Title" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Send_Mobile" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Send_Contents" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="Send_TextID" Type="Int32" />
+          <Property Name="Send_Time" Type="DateTime" Precision="3" />
+          <Property Name="Send_Status" Type="Boolean" />
+          <Property Name="Send_AccountId" Type="Int32" />
+          <Property Name="Send_NeedReply" Type="Boolean" />
+          <Property Name="Send_ReplyId" Type="Int32" />
+          <Property Name="Send_ReplyFlag" Type="Boolean" />
+          <Property Name="Send_Result" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="Send_Flag" Type="Int32" />
+          <Property Name="Send_SMSID" Type="Int64" />
+          <Property Name="Send_Test" Type="Boolean" />
+          <Property Name="Send_ReplyTemplateId" Type="Int32" />
+          <Property Name="Send_IsTD" Type="Boolean" />
+          <Property Name="Send_CreateId" Type="Int32" />
+          <Property Name="Send_CreateTime" Type="DateTime" Precision="3" />
+          <Property Name="Send_UpdateId" Type="Int32" />
+          <Property Name="Send_UpdateDate" Type="DateTime" Precision="3" />
+          <Property Name="Send_DataStatus" Type="Int32" />
+          <Property Name="Send_IsPersonalized" Type="Boolean" />
+          <Property Name="Send_Batch" Type="Int32" />
+          <Property Name="Send_ApiID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Send_ReplyIsTrue" Type="Boolean" />
+          <Property Name="Send_ReportDate" Type="DateTime" Precision="3" />
+          <Property Name="Send_CheckStatus" Type="Boolean" />
+          <Property Name="Send_CheckId" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Send_CheckTime" Type="DateTime" Precision="3" />
+          <Property Name="Send_QuestionId" Type="Int32" />
+          <Property Name="Send_IsOver" Type="Boolean" Nullable="false" />
+          <Property Name="Send_StartFlag" Type="Int32" Nullable="false" />
+          <Property Name="Send_SubmitResult" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Seeding" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Auto_Offer">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Vip_no" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="phone_no" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Channel" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Language" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Offer" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Region" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="CommID" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Date" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="URL" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Flag" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OperateStatus" Type="Int32" />
+          <Property Name="ShortUrl" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Td" Type="Boolean" />
+          <Property Name="Copy" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="AccountId" Type="Int32" />
+        </EntityType>
+        <EntityType Name="Auto_SendLog">
+          <Key>
+            <PropertyRef Name="LogId" />
+          </Key>
+          <Property Name="LogId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LogName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LogType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LogStatus" Type="Int32" />
+          <Property Name="LogTime" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="TD_List">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Mobile" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Conetents" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Dates" Type="DateTime" Precision="3" />
+          <Property Name="Types" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="LC_AUTOFILE">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="vip_no" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="card_type" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="title" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="first_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="last_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="print_name" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="phone_country_code" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="phone_area_code" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="phone_no" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="cust_type" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="recent_store" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="comm_ID" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="URL" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="SEEDING" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="Expired_date" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="FILENAME" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Short_Url" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CreateDate" Type="DateTime" Precision="3" />
+          <Property Name="Copy" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="LC_SHORTURL">
+          <Key>
+            <PropertyRef Name="URL_ID" />
+          </Key>
+          <Property Name="URL_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="URL_SHORT" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="URL_LONG" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="URL_MOBILE" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="URL_VIPNO" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="URL_PRINTNAME" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="URL_DATE" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="URL_COPY" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="URL_SENDTIME" Type="DateTime" Precision="3" />
+          <Property Name="URL_CREATETIME" Type="DateTime" Precision="3" />
+          <Property Name="URL_FILENAME" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ModelsStoreContainer" CdmEntityContainer="ConnectionString">
+          <EntitySetMapping Name="LC_ExceptionLog">
+            <EntityTypeMapping TypeName="Models.LC_ExceptionLog">
+              <MappingFragment StoreEntitySet="LC_ExceptionLog">
+                <ScalarProperty Name="Log_Id" ColumnName="Log_Id" />
+                <ScalarProperty Name="Log_Name" ColumnName="Log_Name" />
+                <ScalarProperty Name="Log_Url" ColumnName="Log_Url" />
+                <ScalarProperty Name="Log_Descr" ColumnName="Log_Descr" />
+                <ScalarProperty Name="Log_Type" ColumnName="Log_Type" />
+                <ScalarProperty Name="Log_Time" ColumnName="Log_Time" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LC_OperateLog">
+            <EntityTypeMapping TypeName="Models.LC_OperateLog">
+              <MappingFragment StoreEntitySet="LC_OperateLog">
+                <ScalarProperty Name="Operate_Remark" ColumnName="Operate_Remark" />
+                <ScalarProperty Name="Operate_Id" ColumnName="Operate_Id" />
+                <ScalarProperty Name="Operate_Name" ColumnName="Operate_Name" />
+                <ScalarProperty Name="Operate_FileName" ColumnName="Operate_FileName" />
+                <ScalarProperty Name="Operate_Time" ColumnName="Operate_Time" />
+                <ScalarProperty Name="Operate_Type" ColumnName="Operate_Type" />
+                <ScalarProperty Name="Operate_Status" ColumnName="Operate_Status" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="YM_SendList">
+            <EntityTypeMapping TypeName="Models.YM_SendList">
+              <MappingFragment StoreEntitySet="YM_SendList">
+                <ScalarProperty Name="Seeding" ColumnName="Seeding" />
+                <ScalarProperty Name="Send_SubmitResult" ColumnName="Send_SubmitResult" />
+                <ScalarProperty Name="Send_StartFlag" ColumnName="Send_StartFlag" />
+                <ScalarProperty Name="Send_IsOver" ColumnName="Send_IsOver" />
+                <ScalarProperty Name="Send_QuestionId" ColumnName="Send_QuestionId" />
+                <ScalarProperty Name="Send_CheckTime" ColumnName="Send_CheckTime" />
+                <ScalarProperty Name="Send_CheckId" ColumnName="Send_CheckId" />
+                <ScalarProperty Name="Send_CheckStatus" ColumnName="Send_CheckStatus" />
+                <ScalarProperty Name="Send_ReportDate" ColumnName="Send_ReportDate" />
+                <ScalarProperty Name="Send_ReplyIsTrue" ColumnName="Send_ReplyIsTrue" />
+                <ScalarProperty Name="Send_ApiID" ColumnName="Send_ApiID" />
+                <ScalarProperty Name="Send_Batch" ColumnName="Send_Batch" />
+                <ScalarProperty Name="Send_IsPersonalized" ColumnName="Send_IsPersonalized" />
+                <ScalarProperty Name="Send_DataStatus" ColumnName="Send_DataStatus" />
+                <ScalarProperty Name="Send_UpdateDate" ColumnName="Send_UpdateDate" />
+                <ScalarProperty Name="Send_UpdateId" ColumnName="Send_UpdateId" />
+                <ScalarProperty Name="Send_CreateTime" ColumnName="Send_CreateTime" />
+                <ScalarProperty Name="Send_CreateId" ColumnName="Send_CreateId" />
+                <ScalarProperty Name="Send_IsTD" ColumnName="Send_IsTD" />
+                <ScalarProperty Name="Send_ReplyTemplateId" ColumnName="Send_ReplyTemplateId" />
+                <ScalarProperty Name="Send_Test" ColumnName="Send_Test" />
+                <ScalarProperty Name="Send_SMSID" ColumnName="Send_SMSID" />
+                <ScalarProperty Name="Send_Flag" ColumnName="Send_Flag" />
+                <ScalarProperty Name="Send_Result" ColumnName="Send_Result" />
+                <ScalarProperty Name="Send_ReplyFlag" ColumnName="Send_ReplyFlag" />
+                <ScalarProperty Name="Send_ReplyId" ColumnName="Send_ReplyId" />
+                <ScalarProperty Name="Send_NeedReply" ColumnName="Send_NeedReply" />
+                <ScalarProperty Name="Send_AccountId" ColumnName="Send_AccountId" />
+                <ScalarProperty Name="Send_Status" ColumnName="Send_Status" />
+                <ScalarProperty Name="Send_Time" ColumnName="Send_Time" />
+                <ScalarProperty Name="Send_TextID" ColumnName="Send_TextID" />
+                <ScalarProperty Name="Send_Contents" ColumnName="Send_Contents" />
+                <ScalarProperty Name="Send_Mobile" ColumnName="Send_Mobile" />
+                <ScalarProperty Name="Send_Title" ColumnName="Send_Title" />
+                <ScalarProperty Name="Send_Id" ColumnName="Send_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auto_Offer">
+            <EntityTypeMapping TypeName="Models.Auto_Offer">
+              <MappingFragment StoreEntitySet="Auto_Offer">
+                <ScalarProperty Name="AccountId" ColumnName="AccountId" />
+                <ScalarProperty Name="Copy" ColumnName="Copy" />
+                <ScalarProperty Name="Td" ColumnName="Td" />
+                <ScalarProperty Name="ShortUrl" ColumnName="ShortUrl" />
+                <ScalarProperty Name="OperateStatus" ColumnName="OperateStatus" />
+                <ScalarProperty Name="Flag" ColumnName="Flag" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="CommID" ColumnName="CommID" />
+                <ScalarProperty Name="Region" ColumnName="Region" />
+                <ScalarProperty Name="Offer" ColumnName="Offer" />
+                <ScalarProperty Name="Language" ColumnName="Language" />
+                <ScalarProperty Name="Channel" ColumnName="Channel" />
+                <ScalarProperty Name="phone_no" ColumnName="phone_no" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Vip_no" ColumnName="Vip_no" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Auto_SendLog">
+            <EntityTypeMapping TypeName="Models.Auto_SendLog">
+              <MappingFragment StoreEntitySet="Auto_SendLog">
+                <ScalarProperty Name="LogTime" ColumnName="LogTime" />
+                <ScalarProperty Name="LogStatus" ColumnName="LogStatus" />
+                <ScalarProperty Name="LogType" ColumnName="LogType" />
+                <ScalarProperty Name="LogName" ColumnName="LogName" />
+                <ScalarProperty Name="LogId" ColumnName="LogId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TD_List">
+            <EntityTypeMapping TypeName="Models.TD_List">
+              <MappingFragment StoreEntitySet="TD_List">
+                <ScalarProperty Name="Types" ColumnName="Types" />
+                <ScalarProperty Name="Dates" ColumnName="Dates" />
+                <ScalarProperty Name="Conetents" ColumnName="Conetents" />
+                <ScalarProperty Name="Mobile" ColumnName="Mobile" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LC_AUTOFILE">
+            <EntityTypeMapping TypeName="Models.LC_AUTOFILE">
+              <MappingFragment StoreEntitySet="LC_AUTOFILE">
+                <ScalarProperty Name="Copy" ColumnName="Copy" />
+                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+                <ScalarProperty Name="Short_Url" ColumnName="Short_Url" />
+                <ScalarProperty Name="FILENAME" ColumnName="FILENAME" />
+                <ScalarProperty Name="Expired_date" ColumnName="Expired_date" />
+                <ScalarProperty Name="SEEDING" ColumnName="SEEDING" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="comm_ID" ColumnName="comm_ID" />
+                <ScalarProperty Name="recent_store" ColumnName="recent_store" />
+                <ScalarProperty Name="cust_type" ColumnName="cust_type" />
+                <ScalarProperty Name="phone_no" ColumnName="phone_no" />
+                <ScalarProperty Name="phone_area_code" ColumnName="phone_area_code" />
+                <ScalarProperty Name="phone_country_code" ColumnName="phone_country_code" />
+                <ScalarProperty Name="print_name" ColumnName="print_name" />
+                <ScalarProperty Name="last_name" ColumnName="last_name" />
+                <ScalarProperty Name="first_name" ColumnName="first_name" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="card_type" ColumnName="card_type" />
+                <ScalarProperty Name="vip_no" ColumnName="vip_no" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LC_SHORTURL">
+            <EntityTypeMapping TypeName="Models.LC_SHORTURL">
+              <MappingFragment StoreEntitySet="LC_SHORTURL">
+                <ScalarProperty Name="URL_FILENAME" ColumnName="URL_FILENAME" />
+                <ScalarProperty Name="URL_CREATETIME" ColumnName="URL_CREATETIME" />
+                <ScalarProperty Name="URL_SENDTIME" ColumnName="URL_SENDTIME" />
+                <ScalarProperty Name="URL_COPY" ColumnName="URL_COPY" />
+                <ScalarProperty Name="URL_DATE" ColumnName="URL_DATE" />
+                <ScalarProperty Name="URL_PRINTNAME" ColumnName="URL_PRINTNAME" />
+                <ScalarProperty Name="URL_VIPNO" ColumnName="URL_VIPNO" />
+                <ScalarProperty Name="URL_MOBILE" ColumnName="URL_MOBILE" />
+                <ScalarProperty Name="URL_LONG" ColumnName="URL_LONG" />
+                <ScalarProperty Name="URL_SHORT" ColumnName="URL_SHORT" />
+                <ScalarProperty Name="URL_ID" ColumnName="URL_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

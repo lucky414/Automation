@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="LC_Members">
+          <Key>
+            <PropertyRef Name="Mem_Id" />
+          </Key>
+          <Property Name="Mem_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Mem_VipNo" Type="varchar" MaxLength="20" />
+          <Property Name="Mem_Mobile" Type="varchar" MaxLength="20" />
+          <Property Name="Mem_PrintName" Type="nvarchar" MaxLength="100" />
+          <Property Name="Mem_FirstName" Type="nvarchar" MaxLength="50" />
+          <Property Name="Mem_LastName" Type="nvarchar" MaxLength="50" />
+          <Property Name="Mem_CommId" Type="varchar" MaxLength="100" />
+          <Property Name="Mem_LongUrl" Type="varchar" MaxLength="500" />
+          <Property Name="Mem_Flag" Type="varchar" MaxLength="20" />
+          <Property Name="Mem_IsDeal" Type="bit" Nullable="false" />
+          <Property Name="Mem_CreateDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="LC_ShortUrlList">
+          <Key>
+            <PropertyRef Name="Short_Id" />
+          </Key>
+          <Property Name="Short_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Short_Mobile" Type="varchar" MaxLength="20" />
+          <Property Name="Short_VipNo" Type="varchar" MaxLength="20" />
+          <Property Name="Short_LongUrl" Type="varchar" MaxLength="500" />
+          <Property Name="Short_ShortUrl" Type="varchar" MaxLength="50" />
+          <Property Name="Short_Flag" Type="varchar" MaxLength="20" />
+          <Property Name="Short_CommId" Type="varchar" MaxLength="100" />
+          <Property Name="Short_CreateDate" Type="datetime" />
+        </EntityType>
+        <EntityContainer Name="DBModelStoreContainer">
+          <EntitySet Name="LC_Members" EntityType="Self.LC_Members" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LC_ShortUrlList" EntityType="Self.LC_ShortUrlList" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="LC_Members">
+          <Key>
+            <PropertyRef Name="Mem_Id" />
+          </Key>
+          <Property Name="Mem_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Mem_VipNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Mem_Mobile" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Mem_PrintName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Mem_FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Mem_LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Mem_CommId" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Mem_LongUrl" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Mem_Flag" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Mem_IsDeal" Type="Boolean" Nullable="false" />
+          <Property Name="Mem_CreateDate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="LC_ShortUrlList">
+          <Key>
+            <PropertyRef Name="Short_Id" />
+          </Key>
+          <Property Name="Short_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Short_Mobile" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Short_VipNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Short_LongUrl" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Short_ShortUrl" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Short_Flag" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Short_CommId" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Short_CreateDate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityContainer Name="DataEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="LC_Members" EntityType="Self.LC_Members" />
+          <EntitySet Name="LC_ShortUrlList" EntityType="Self.LC_ShortUrlList" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DBModelStoreContainer" CdmEntityContainer="DataEntities">
+          <EntitySetMapping Name="LC_Members">
+            <EntityTypeMapping TypeName="DBModel.LC_Members">
+              <MappingFragment StoreEntitySet="LC_Members">
+                <ScalarProperty Name="Mem_Id" ColumnName="Mem_Id" />
+                <ScalarProperty Name="Mem_VipNo" ColumnName="Mem_VipNo" />
+                <ScalarProperty Name="Mem_Mobile" ColumnName="Mem_Mobile" />
+                <ScalarProperty Name="Mem_PrintName" ColumnName="Mem_PrintName" />
+                <ScalarProperty Name="Mem_FirstName" ColumnName="Mem_FirstName" />
+                <ScalarProperty Name="Mem_LastName" ColumnName="Mem_LastName" />
+                <ScalarProperty Name="Mem_CommId" ColumnName="Mem_CommId" />
+                <ScalarProperty Name="Mem_LongUrl" ColumnName="Mem_LongUrl" />
+                <ScalarProperty Name="Mem_Flag" ColumnName="Mem_Flag" />
+                <ScalarProperty Name="Mem_IsDeal" ColumnName="Mem_IsDeal" />
+                <ScalarProperty Name="Mem_CreateDate" ColumnName="Mem_CreateDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LC_ShortUrlList">
+            <EntityTypeMapping TypeName="DBModel.LC_ShortUrlList">
+              <MappingFragment StoreEntitySet="LC_ShortUrlList">
+                <ScalarProperty Name="Short_Id" ColumnName="Short_Id" />
+                <ScalarProperty Name="Short_Mobile" ColumnName="Short_Mobile" />
+                <ScalarProperty Name="Short_VipNo" ColumnName="Short_VipNo" />
+                <ScalarProperty Name="Short_LongUrl" ColumnName="Short_LongUrl" />
+                <ScalarProperty Name="Short_ShortUrl" ColumnName="Short_ShortUrl" />
+                <ScalarProperty Name="Short_Flag" ColumnName="Short_Flag" />
+                <ScalarProperty Name="Short_CommId" ColumnName="Short_CommId" />
+                <ScalarProperty Name="Short_CreateDate" ColumnName="Short_CreateDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

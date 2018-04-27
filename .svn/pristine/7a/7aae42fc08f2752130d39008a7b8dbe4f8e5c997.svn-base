@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Optimization;
+using System.Web.Routing;
+
+namespace Automation
+{
+    public class MvcApplication : System.Web.HttpApplication
+    {
+        protected void Application_Start()
+        {
+            AreaRegistration.RegisterAllAreas();
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            FluentScheduler.JobManager.Initialize(new ScheduleTask());
+        }
+        protected void Application_End(object sender, EventArgs e)
+        {
+            string strUrl = System.Configuration.ConfigurationManager.AppSettings["SelfAddress"];//本程序部署地址  
+            System.Net.HttpWebRequest httpWebRequest = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(strUrl);
+            System.Net.HttpWebResponse httpWebResponse = (System.Net.HttpWebResponse)httpWebRequest.GetResponse();
+            System.IO.Stream stream = httpWebResponse.GetResponseStream();//得到回写的字节流  
+            httpWebResponse.Close();
+        }
+    }
+}
