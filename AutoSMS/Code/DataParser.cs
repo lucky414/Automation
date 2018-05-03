@@ -25,37 +25,52 @@ namespace AutoSMS.Code
         public void Init()
         {
             log.WriteLog("Task Start");
+            string hh = System.Configuration.ConfigurationManager.AppSettings["StartHour"];
+            string mm = System.Configuration.ConfigurationManager.AppSettings["StartMinute"];
             Registry registry = new Registry();
-            registry.Schedule(() => ParseDocument()).ToRunNow().AndEvery(1).Days().At(18,10);
+            registry.Schedule(() => ParseDocument()).ToRunNow().AndEvery(1).Days().At(Int32.Parse(hh),Int32.Parse(mm));
             JobManager.Initialize(registry);
         }
         public void ParseDocument()
         {
             log.WriteLog("Task Run");
-            XmlDocument pdoc = new XmlDocument();
-            string xmlFile = System.AppDomain.CurrentDomain.BaseDirectory + @"Files\Schedule.xml";
-            pdoc.Load(xmlFile);
+            try
+            {
+                XmlDocument pdoc = new XmlDocument();
+                string xmlFile = System.AppDomain.CurrentDomain.BaseDirectory + @"Files\Schedule.xml";
+                pdoc.Load(xmlFile);
 
-            XmlNodeList nodeList = pdoc.SelectNodes("root/date");
-            List<string> dates = new List<string>();
-            foreach (XmlNode node in nodeList)
-            {
-                dates.Add(node.InnerText);
-            }
-            string name = DateTime.Now.ToString("yyyy-MM-dd");
-            if (dates.Contains(DateTime.Now.ToString("yyyy-MM-dd")))
-            {
-                string filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", DateTime.Now.ToString("MM_yyyy"));
-                int count = repository.Count<DataModel.LC_AUTOFILE>(x => x.FILENAME.ToLower().Equals(filename.ToLower()));
-                if (count == 0)
+                XmlNodeList nodeList = pdoc.SelectNodes("root/date");
+                List<string> dates = new List<string>();
+                foreach (XmlNode node in nodeList)
                 {
-                    ParseData();
+                    dates.Add(node.InnerText);
                 }
+                string name = DateTime.Now.ToString("yyyy-MM-dd");
+                if (dates.Contains(DateTime.Now.ToString("yyyy-MM-dd")))
+                {
+                    string filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", DateTime.Now.ToString("MM_yyyy"));
+                    int count = repository.Count<DataModel.LC_AUTOFILE>(x => x.FILENAME.ToLower().Equals(filename.ToLower()));
+                    if (count == 0)
+                    {
+                        ParseData();
+                    }
 
+                }
+                else
+                {
+                    log.WriteLog("不是发送日");
+                }
             }
+            catch (Exception ex)
+            {
+                log.WriteLog("ParseDocument error：" + ex.Message);
+            }
+           
         }
         private void ParseData()
         {
+            log.WriteLog("Parse Data");
             FtpTools ftp = new FtpTools();
             string[] file = ftp.GetFileList(DateTime.Now.ToString("yyyyMM") + "/");
             if (file == null)
@@ -227,8 +242,8 @@ namespace AutoSMS.Code
                 }
             }
             log.WriteLog(string.Format("生成短链接失败数量：{0}", j.ToString()));
-            int errormobile = totalCount - datalist.Count;
-            i += errormobile;
+           // int errormobile = totalCount - datalist.Count;
+            //i += errormobile;
             log.WriteLog(string.Format("无效数量：{0}",i.ToString()));
             // 提交发送
             var td = repository.GetAll<TD_List>().ToList();
