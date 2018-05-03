@@ -17,30 +17,55 @@ namespace Auto_BL.Models
         {
             repository = new Repository.Repository(new Auto_Bl_Entities());
         }
+        public void Init()
+        {
+            LogUtil.WriteLog("Task Init");
+            string hh = System.Configuration.ConfigurationManager.AppSettings["StartHour"];
+            string mm = System.Configuration.ConfigurationManager.AppSettings["StartMinute"];
+            Registry registry = new Registry();
+            registry.Schedule(() => Execute()).ToRunEvery(1).Days().At(Int32.Parse(hh), Int32.Parse(mm));
+            // registry.Schedule(() => Execute()).ToRunNow().AndEvery(1).Days().At(Int32.Parse(hh), Int32.Parse(mm));
+            JobManager.Initialize(registry);
+        }
         public void Execute()
         {
 
-            string weekstr = DateTime.Now.DayOfWeek.ToString();
-            LogUtil.WriteLog("TaskStart:" + weekstr);
-            if (weekstr.Equals("Thursday", StringComparison.OrdinalIgnoreCase))
+           // string weekstr = DateTime.Now.DayOfWeek.ToString();
+            LogUtil.WriteLog("Task Execute");
+            try
             {
-                //每周四发
-                //SS18 Beauty Loyalty 20180419
-                string dates = DateTime.Now.ToString("yyyyMMdd");
-                string ftpFilePath = FtpConfig.ftpFilePath + "SS18 Beauty Loyalty " + dates + "/";
-                FtpTools ftp = new FtpTools();
+                XmlDocument pdoc = new XmlDocument();
+                string xmlFile = System.AppDomain.CurrentDomain.BaseDirectory + @"Files\Schedule.xml";
+                pdoc.Load(xmlFile);
 
-                string[] file = ftp.GetFileList(ftpFilePath);
-                if (file == null)
+                XmlNodeList nodeList = pdoc.SelectNodes("root/date");
+                List<string> sendDates = new List<string>();
+                foreach (XmlNode node in nodeList)
                 {
-                    HttpUtil.SendByFocusSend("Beauty Loyalty Auto SMS Notification", "FTP上未发现文件");
-                    HttpUtil.SendSMS("FTP上未发现文件");
+                    sendDates.Add(node.InnerText);
                 }
-                else
+                string name = DateTime.Now.ToString("yyyy-MM-dd");
+                if (sendDates.Contains(DateTime.Now.ToString("yyyy-MM-dd")))
                 {
-                    string filename = string.Format("CN_Beauty_Loyalty_{0}.csv", DateTime.Now.ToString("yyyy-MM-dd"));
-                    if (file.Contains(filename))
+                    string dates = DateTime.Now.ToString("yyyyMMdd");
+                    string ftpFilePath = FtpConfig.ftpFilePath + "SS18 Beauty Loyalty " + dates + "/";
+                    FtpTools ftp = new FtpTools();
+
+                    string[] file = ftp.GetFileList(ftpFilePath);
+                    if (file == null)
                     {
+                        HttpUtil.SendByFocusSend("Beauty Loyalty Auto SMS Notification", "FTP上未发现文件");
+                        HttpUtil.SendSMS("FTP上未发现文件");
+                    }
+                    else if (file.Length > 1)
+                    {
+                        HttpUtil.SendByFocusSend("Beauty Loyalty Auto SMS Notification", "文件夹内不止1份发送数据");
+                        HttpUtil.SendSMS("文件夹内不止1份发送数据");
+                    }
+                    else
+                    {
+                        // string filename = string.Format("CN_Beauty_Loyalty_{0}.csv", DateTime.Now.ToString("yyyy-MM-dd"));
+                        string filename = file[0];
                         string info = string.Empty;
                         string localPath = System.AppDomain.CurrentDomain.BaseDirectory + "Files\\" + dates;
                         bool downresult = ftp.Download(localPath, filename, ftpFilePath, out info);
@@ -61,18 +86,35 @@ namespace Auto_BL.Models
                             }
                             else
                             {
-                                HttpUtil.SendByFocusSend("Post Purchase Survey Auto SMS Notification", "自动化文件数据为空");
+                                HttpUtil.SendByFocusSend("Beauty Loyalty Auto SMS Notification", "自动化文件数据为空");
                                 HttpUtil.SendSMS("自动化文件数据为空");
                             }
                         }
+                        else
+                        {
+                            LogUtil.WriteLog("从FTP下载文件失败");
+                        }
                     }
-                    else
-                    {
-                        HttpUtil.SendByFocusSend("Beauty Loyalty Auto SMS Notification", "FTP上未发现文件");
-                        HttpUtil.SendSMS("FTP上未发现文件");
-                    }
+                    //string filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", DateTime.Now.ToString("MM_yyyy"));
+                    //int count = repository.Count<DataModel.LC_AUTOFILE>(x => x.FILENAME.ToLower().Equals(filename.ToLower()));
+                    //if (count == 0)
+                    //{
+                    //    ParseData();
+                    //}
+
                 }
+
             }
+            catch (Exception ex)
+            {
+                LogUtil.WriteLog("ParseDocument error：" + ex.Message);
+            }
+            //if (weekstr.Equals("Thursday", StringComparison.OrdinalIgnoreCase))
+            //{
+            //    //每周四发
+            //    //SS18 Beauty Loyalty 20180419
+                
+            //}
         }
         private DataTable GetDataFromCSV(string path)
         {

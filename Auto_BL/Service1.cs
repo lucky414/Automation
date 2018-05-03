@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Auto_BL.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,10 +20,16 @@ namespace Auto_BL
 
         protected override void OnStart(string[] args)
         {
+            Models.LogUtil.WriteLog("Service Start");
+            Task.Factory.StartNew(() => {
+                SendTask t1 = new SendTask();
+                t1.Execute();
+            });
         }
 
         protected override void OnStop()
         {
+            Models.LogUtil.WriteLog("Service Stop");
         }
     }
 }
