@@ -23,7 +23,7 @@ namespace Auto_BL
             Models.LogUtil.WriteLog("Service Start");
             Task.Factory.StartNew(() => {
                 SendTask t1 = new SendTask();
-                t1.Execute();
+                t1.Init();
             });
         }
 
