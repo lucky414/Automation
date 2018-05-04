@@ -23,8 +23,8 @@ namespace Auto_BL.Models
             string hh = System.Configuration.ConfigurationManager.AppSettings["StartHour"];
             string mm = System.Configuration.ConfigurationManager.AppSettings["StartMinute"];
             Registry registry = new Registry();
-            registry.Schedule(() => Execute()).ToRunEvery(1).Days().At(Int32.Parse(hh), Int32.Parse(mm));
-            // registry.Schedule(() => Execute()).ToRunNow().AndEvery(1).Days().At(Int32.Parse(hh), Int32.Parse(mm));
+            //registry.Schedule(() => Execute()).ToRunEvery(1).Days().At(Int32.Parse(hh), Int32.Parse(mm));
+             registry.Schedule(() => Execute()).ToRunNow().AndEvery(1).Days().At(Int32.Parse(hh), Int32.Parse(mm));
             JobManager.Initialize(registry);
         }
         public void Execute()
@@ -48,7 +48,11 @@ namespace Auto_BL.Models
                 if (sendDates.Contains(DateTime.Now.ToString("yyyy-MM-dd")))
                 {
                     string dates = DateTime.Now.ToString("yyyyMMdd");
-                    string ftpFilePath = FtpConfig.ftpFilePath + "SS18 Beauty Loyalty " + dates + "/";
+                    if (System.Configuration.ConfigurationManager.AppSettings["IsTesting"] == "1")
+                    {
+                        dates = "Testing";
+                    }
+                    string ftpFilePath = FtpConfig.ftpFilePath + "2018 Beauty Loyalty Bi-weekly Automation SMS/" + dates + "/";
                     FtpTools ftp = new FtpTools();
 
                     string[] file = ftp.GetFileList(ftpFilePath);
@@ -176,7 +180,7 @@ namespace Auto_BL.Models
             {
                 try
                 {
-                    if (dr.IsNull("phone_no") || dr.IsNull("Cut Off Date")||dr.IsNull("Current Tier") || dr.IsNull("COS_Spend"))
+                    if (dr.IsNull("phone_no") || dr.IsNull("Cut Off Date") ||dr.IsNull("Current Tier") || dr.IsNull("COS_Spend"))
                     {
                         i++;
                         //空值不处理
@@ -188,25 +192,29 @@ namespace Auto_BL.Models
                         string spend_to_next= dr["Spending to Next Tier"].ToString().Length <= 3 ? dr["Spending to Next Tier"].ToString() : Int32.Parse(dr["Spending to Next Tier"].ToString()).ToString("N0");
                         if (copy != null)
                         {
-                            copy = copy.Replace("[Last Name][Title]", dr["last_name_eng"].ToString()+ dr["title_adj"].ToString());
-                            copy = copy.Replace("[Cut Off Date]", dr["Cut Off Date"].ToString());
+                            copy = copy.Replace("[Last Name][Title]", dr["last_name_eng"].ToString() + dr["title_adj"].ToString());
+                            copy = copy.Replace("[Cut Off Date]", DateTime.Parse(dr["Cut Off Date"].ToString()).ToString("yyyy年MM月dd日"));
                             copy = copy.Replace("[COS Spend]", cos_spend);
                             copy = copy.Replace("[Spending to Next Tier]", spend_to_next);
-                      
+                            Models.FTP_FILE auto = new FTP_FILE();
+                            auto.COSSPEND = cos_spend;
+                            auto.CUTOFFDATE = dr["Cut Off Date"].ToString();
+                            auto.DATES = DateTime.Now;
+                            auto.LASTNAME = dr["last_name_eng"].ToString();
+                            auto.NAME = filename;
+                            auto.MOBILE = dr["phone_no"].ToString();
+                            auto.SPENDTONEXTTIER = spend_to_next;
+                            auto.TIER = dr["Current Tier"].ToString();
+                            auto.TITLE = dr["title_adj"].ToString();
+                            auto.COPY = copy;
+                            repository.Add<Models.FTP_FILE>(auto);
+                            repository.UnitOfWork.SaveChanges();
+
                         }
-                        Models.FTP_FILE auto = new FTP_FILE();
-                        auto.COSSPEND = cos_spend;
-                        auto.CUTOFFDATE = dr["Cut Off Date"].ToString();
-                        auto.DATES = DateTime.Now;
-                        auto.LASTNAME = dr["last_name_eng"].ToString();
-                        auto.NAME = filename;
-                        auto.MOBILE = dr["phone_no"].ToString();
-                        auto.SPENDTONEXTTIER = spend_to_next;
-                        auto.TIER = dr["Current Tier"].ToString();
-                        auto.TITLE = dr["title_adj"].ToString();
-                        auto.COPY = copy;
-                        repository.Add<Models.FTP_FILE>(auto);
-                        repository.UnitOfWork.SaveChanges();
+                        else {
+                            i++;
+                        }
+                
 
                     }
                 }
@@ -222,44 +230,53 @@ namespace Auto_BL.Models
             var sendcount = repository.GetQuery<Models.FTP_FILE>(x => x.NAME.Equals(filename, StringComparison.OrdinalIgnoreCase));
             var unique = from p in sendcount group p by p.MOBILE into g select new { g.Key, Copy = g.Max(p => p.COPY) };
             int m = sendcount.Count() - unique.Count();
+            LogUtil.WriteLog(string.Format("重复数量：{0}",m.ToString()));
             int wx = unique.Count(g => g.Key.Length != 11);
             var sendlist = from s in unique where !td.Any(ss => ss.Mobile.Equals(s.Key)) && s.Key.Length == 11 select s;
             i = i + wx;
+            LogUtil.WriteLog(string.Format("无效数量：{0}", i.ToString()));
             int n = sendlist.Count();
+            LogUtil.WriteLog(string.Format("发送数量：{0}", n.ToString()));
             int u = unique.Count() - n - wx;
+            LogUtil.WriteLog(string.Format("TD数量：{0}", u.ToString()));
             DateTime time = DateTime.Now;
-            foreach (var item in sendlist)
+            if (sendlist.Count() > 0)
             {
-                Models.YM_SendList send = new YM_SendList();
-                send.Send_AccountId = 1;
-                send.Send_Batch = 1;
-                send.Send_CheckId = "Auto_BL";
-                send.Send_CheckStatus = true;
-                send.Send_CheckTime = time;
-                send.Send_Contents = item.Copy;
-                send.Send_CreateId = 1;
-                send.Send_CreateTime = time;
-                send.Send_DataStatus = 1;
-                send.Send_Flag = 1;
-                send.Send_IsOver = true;
-                send.Send_IsPersonalized = true;
-                send.Send_IsTD = false;
-                send.Send_Mobile = item.Key;
-                send.Send_NeedReply = false;
-                send.Send_QuestionId = 0;
-                send.Send_ReplyFlag = false;
-                send.Send_ReplyId = 0;
-                send.Send_Result = "";
-                send.Send_SMSID = long.Parse(smsid);
-                send.Send_StartFlag = 0;
-                send.Send_Status = false;
-                send.Send_SubmitResult = "";
-                send.Send_Test = false;
-                send.Send_Time = sendTime;
-                send.Send_Title = "Automation" + DateTime.Now.ToString("yyyyMM");
-                repository.Add<Models.YM_SendList>(send);
+                foreach (var item in sendlist)
+                {
+                    Models.YM_SendList send = new YM_SendList();
+                    send.Send_AccountId = 1;
+                    send.Send_Batch = 1;
+                    send.Send_CheckId = "Auto_BL";
+                    send.Send_CheckStatus = true;
+                    send.Send_CheckTime = time;
+                    send.Send_Contents = item.Copy;
+                    send.Send_CreateId = 1;
+                    send.Send_CreateTime = time;
+                    send.Send_DataStatus = 1;
+                    send.Send_Flag = 1;
+                    send.Send_IsOver = true;
+                    send.Send_IsPersonalized = true;
+                    send.Send_IsTD = false;
+                    send.Send_Mobile = item.Key;
+                    send.Send_NeedReply = false;
+                    send.Send_QuestionId = 0;
+                    send.Send_ReplyFlag = false;
+                    send.Send_ReplyId = 0;
+                    send.Send_Result = "";
+                    send.Send_SMSID = long.Parse(smsid);
+                    send.Send_StartFlag = 0;
+                    send.Send_Status = false;
+                    send.Send_SubmitResult = "";
+                    send.Send_Test = false;
+                    send.Send_Time = sendTime;
+                    send.Send_Title = "Automation" + DateTime.Now.ToString("yyyyMM");
+                    repository.Add<Models.YM_SendList>(send);
+
+                }
+                repository.UnitOfWork.SaveChanges();
             }
-            repository.UnitOfWork.SaveChanges();
+            LogUtil.WriteLog("Task  解析结束");
             string body = string.Format("你好，本次自动化数据处理结果如下：<br />总数：{0}<br />TD数量：{1}<br />无效数量：{2}<br />重复数量：{3}<br />发送数量：{4}<br />发送时间：{5}", totalCount.ToString(), u.ToString(), i.ToString(),  m.ToString(), n.ToString(), sendTime);
             HttpUtil.SendByFocusSend("Post Purchase Survey Auto SMS Notification", body);
             string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n重复数量：{3}\n发送数量：{4}\n发送时间：{5}", totalCount.ToString(), u.ToString(), i.ToString(),  m.ToString(), n.ToString(), sendTime);

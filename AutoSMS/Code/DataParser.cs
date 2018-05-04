@@ -177,16 +177,23 @@ namespace AutoSMS.Code
             {
                 try
                 {
-
-                    LC_AUTOFILE auto = new LC_AUTOFILE();
-                    auto.print_name =dr.IsNull("print_name") ?string.Empty: dr["print_name"].ToString();
-                    auto.URL = dr.IsNull("URL") ? string.Empty : dr["URL"].ToString(); dr["URL"].ToString();
-                    auto.phone_no = dr.IsNull("phone_no") ? string.Empty : dr["phone_no"].ToString() ;
-                    auto.Expired_date = dr.IsNull("Expired date") ? string.Empty : dr["Expired date"].ToString() ;
-                    auto.FILENAME = filename;
-                    auto.CreateDate = DateTime.Now;
-                    repository.Add<LC_AUTOFILE>(auto);
-                    repository.UnitOfWork.SaveChanges();
+                    if (httper.IsDateTime(dr["Expired date"].ToString()))
+                    {
+                        LC_AUTOFILE auto = new LC_AUTOFILE();
+                        auto.print_name = dr.IsNull("print_name") ? string.Empty : dr["print_name"].ToString();
+                        auto.URL = dr.IsNull("URL") ? string.Empty : dr["URL"].ToString(); dr["URL"].ToString();
+                        auto.phone_no = dr.IsNull("phone_no") ? string.Empty : dr["phone_no"].ToString();
+                        auto.Expired_date = dr.IsNull("Expired date") ? string.Empty : dr["Expired date"].ToString();
+                        auto.FILENAME = filename;
+                        auto.CreateDate = DateTime.Now;
+                        repository.Add<LC_AUTOFILE>(auto);
+                        repository.UnitOfWork.SaveChanges();
+                    }
+                    else
+                    {
+                        i++;
+                    }
+           
                 }
                 catch (Exception ex)
                 {
