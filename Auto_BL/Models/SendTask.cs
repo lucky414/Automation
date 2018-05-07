@@ -58,12 +58,12 @@ namespace Auto_BL.Models
                     string[] file = ftp.GetFileList(ftpFilePath);
                     if (file == null)
                     {
-                        HttpUtil.SendByFocusSend("Beauty Loyalty Auto SMS Notification", "FTP上未发现文件");
+                        HttpUtil.SendByFocusSend("Beauty Loyalty Bi-weekly Automation SMS", "FTP上未发现文件");
                         HttpUtil.SendSMS("FTP上未发现文件");
                     }
                     else if (file.Length > 1)
                     {
-                        HttpUtil.SendByFocusSend("Beauty Loyalty Auto SMS Notification", "文件夹内不止1份发送数据");
+                        HttpUtil.SendByFocusSend("Beauty Loyalty Bi-weekly Automation SMS", "文件夹内不止1份发送数据");
                         HttpUtil.SendSMS("文件夹内不止1份发送数据");
                     }
                     else
@@ -71,41 +71,47 @@ namespace Auto_BL.Models
                         // string filename = string.Format("CN_Beauty_Loyalty_{0}.csv", DateTime.Now.ToString("yyyy-MM-dd"));
                         string filename = file[0];
                         string info = string.Empty;
-                        string localPath = System.AppDomain.CurrentDomain.BaseDirectory + "Files\\" + dates;
-                        bool downresult = ftp.Download(localPath, filename, ftpFilePath, out info);
-                        if (downresult)
+                        int exists = repository.Count<Models.FTP_FILE>(x => x.NAME.Equals(filename));
+                        if (exists == 0)
                         {
-                            DataTable cstData = GetDataFromCSV(localPath + "/" + filename);
-                            if (cstData != null && cstData.Rows.Count > 0)
+                            string localPath = System.AppDomain.CurrentDomain.BaseDirectory + "Files\\" + dates;
+                            bool downresult = ftp.Download(localPath, filename, ftpFilePath, out info);
+                            if (downresult)
                             {
-                                try
+                                DataTable cstData = GetDataFromCSV(localPath + "/" + filename);
+                                if (cstData != null && cstData.Rows.Count > 0)
                                 {
-                                    SaveData(cstData, filename);
-                                }
-                                catch (Exception ex)
-                                {
-                                    LogUtil.WriteLog("error:" + ex.Message);
-                                }
+                                    try
+                                    {
+                                        SaveData(cstData, filename);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        LogUtil.WriteLog("error:" + ex.Message);
+                                    }
 
+                                }
+                                else
+                                {
+                                    HttpUtil.SendByFocusSend("Beauty Loyalty Bi-weekly Automation SMS", "自动化文件数据为空");
+                                    HttpUtil.SendSMS("自动化文件数据为空");
+                                }
                             }
                             else
                             {
-                                HttpUtil.SendByFocusSend("Beauty Loyalty Auto SMS Notification", "自动化文件数据为空");
-                                HttpUtil.SendSMS("自动化文件数据为空");
+                                LogUtil.WriteLog("从FTP下载文件失败");
                             }
                         }
                         else
                         {
-                            LogUtil.WriteLog("从FTP下载文件失败");
+                            LogUtil.WriteLog("文件已存在");
                         }
-                    }
-                    //string filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", DateTime.Now.ToString("MM_yyyy"));
-                    //int count = repository.Count<DataModel.LC_AUTOFILE>(x => x.FILENAME.ToLower().Equals(filename.ToLower()));
-                    //if (count == 0)
-                    //{
-                    //    ParseData();
-                    //}
 
+                    }
+                }
+                else
+                {
+                    LogUtil.WriteLog("不是发送日");
                 }
 
             }
@@ -123,7 +129,7 @@ namespace Auto_BL.Models
         private DataTable GetDataFromCSV(string path)
         {
             DataTable dt = new DataTable();
-            using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
+            using (StreamReader sr = new StreamReader(path, System.Text.Encoding.GetEncoding("GB2312")))
             {
                 string strTitle = sr.ReadLine();
 
@@ -163,7 +169,8 @@ namespace Auto_BL.Models
         private void SaveData(DataTable dt, string filename)
         {
             string smsid = DateTime.Now.ToString("yyyyMMddHHmmss");
-            DateTime sendTime = DateTime.Now.AddHours(3);
+            DateTime sendTime = Convert.ToDateTime(DateTime.Now.ToShortDateString()).AddHours(16);
+       
             int totalCount = dt.Rows.Count;
             int i = 0;
             XmlDocument pdoc = new XmlDocument();
@@ -180,41 +187,56 @@ namespace Auto_BL.Models
             {
                 try
                 {
-                    if (dr.IsNull("phone_no") || dr.IsNull("Cut Off Date") ||dr.IsNull("Current Tier") || dr.IsNull("COS_Spend"))
+                    if (dr.IsNull("phone_no") || dr.IsNull("Cut Off Date") || dr.IsNull("Current Tier") || dr.IsNull("COS_Spend"))
                     {
                         i++;
                         //空值不处理
                     }
                     else
                     {
-                        String copy = dic[dr["Current Tier"].ToString()];
-                        string cos_spend= dr["COS_Spend"].ToString().Length <= 3 ? dr["COS_Spend"].ToString() : Int32.Parse(dr["COS_Spend"].ToString()).ToString("N0");
-                        string spend_to_next= dr["Spending to Next Tier"].ToString().Length <= 3 ? dr["Spending to Next Tier"].ToString() : Int32.Parse(dr["Spending to Next Tier"].ToString()).ToString("N0");
-                        if (copy != null)
+                        if (string.IsNullOrWhiteSpace(dr["last_name_eng"].ToString()) && string.IsNullOrWhiteSpace(dr["last_name_chi"].ToString()) && string.IsNullOrWhiteSpace(dr["title_adj"].ToString()))
                         {
-                            copy = copy.Replace("[Last Name][Title]", dr["last_name_eng"].ToString() + dr["title_adj"].ToString());
-                            copy = copy.Replace("[Cut Off Date]", DateTime.Parse(dr["Cut Off Date"].ToString()).ToString("yyyy年MM月dd日"));
-                            copy = copy.Replace("[COS Spend]", cos_spend);
-                            copy = copy.Replace("[Spending to Next Tier]", spend_to_next);
-                            Models.FTP_FILE auto = new FTP_FILE();
-                            auto.COSSPEND = cos_spend;
-                            auto.CUTOFFDATE = dr["Cut Off Date"].ToString();
-                            auto.DATES = DateTime.Now;
-                            auto.LASTNAME = dr["last_name_eng"].ToString();
-                            auto.NAME = filename;
-                            auto.MOBILE = dr["phone_no"].ToString();
-                            auto.SPENDTONEXTTIER = spend_to_next;
-                            auto.TIER = dr["Current Tier"].ToString();
-                            auto.TITLE = dr["title_adj"].ToString();
-                            auto.COPY = copy;
-                            repository.Add<Models.FTP_FILE>(auto);
-                            repository.UnitOfWork.SaveChanges();
-
-                        }
-                        else {
                             i++;
+                            //尊称空值不处理
                         }
-                
+                        else
+                        {
+                            String copy = dic[dr["Current Tier"].ToString()];
+                            string cos_spend = dr["COS_Spend"].ToString().Length <= 3 ? dr["COS_Spend"].ToString() : Int32.Parse(dr["COS_Spend"].ToString()).ToString("N0");
+                            string spend_to_next = dr["Spending to Next Tier"].ToString().Length <= 3 ? dr["Spending to Next Tier"].ToString() : Int32.Parse(dr["Spending to Next Tier"].ToString()).ToString("N0");
+                            if (copy != null)
+                            {
+                                string title = dr["last_name_eng"].ToString() + dr["title_adj"].ToString();
+                                if (string.IsNullOrWhiteSpace(dr["last_name_eng"].ToString()) && !string.IsNullOrWhiteSpace(dr["last_name_chi"].ToString()))
+                                {
+                                    title= dr["last_name_chi"].ToString() + dr["title_adj"].ToString();
+                                }
+                                copy = copy.Replace("[Last Name][Title]", title);
+                                copy = copy.Replace("[Cut Off Date]", dr["Cut Off Date"].ToString());
+                                copy = copy.Replace("[COS Spend]", cos_spend);
+                                copy = copy.Replace("[Spending to Next Tier]", spend_to_next);
+                                Models.FTP_FILE auto = new FTP_FILE();
+                                auto.COSSPEND = cos_spend;
+                                auto.CUTOFFDATE = dr["Cut Off Date"].ToString();
+                                auto.DATES = DateTime.Now;
+                                auto.LASTNAME = dr["last_name_eng"].ToString();
+                                auto.NAME = filename;
+                                auto.MOBILE = dr["phone_no"].ToString();
+                                auto.SPENDTONEXTTIER = spend_to_next;
+                                auto.TIER = dr["Current Tier"].ToString();
+                                auto.TITLE = dr["title_adj"].ToString();
+                                auto.COPY = copy;
+                                repository.Add<Models.FTP_FILE>(auto);
+                                repository.UnitOfWork.SaveChanges();
+
+                            }
+                            else
+                            {
+                                i++;
+                            }
+                        }
+
+
 
                     }
                 }
@@ -228,11 +250,11 @@ namespace Auto_BL.Models
             // 提交发送
             var td = repository.GetAll<Models.TD_List>();
             var sendcount = repository.GetQuery<Models.FTP_FILE>(x => x.NAME.Equals(filename, StringComparison.OrdinalIgnoreCase));
-            var unique = from p in sendcount group p by p.MOBILE into g select new { g.Key, Copy = g.Max(p => p.COPY) };
+            var unique = from p in sendcount group p by new { Mobile=p.MOBILE,CommId=p.TIER} into g select new { g.Key.Mobile,g.Key.CommId, Copy = g.Max(p => p.COPY) };
             int m = sendcount.Count() - unique.Count();
             LogUtil.WriteLog(string.Format("重复数量：{0}",m.ToString()));
-            int wx = unique.Count(g => g.Key.Length != 11);
-            var sendlist = from s in unique where !td.Any(ss => ss.Mobile.Equals(s.Key)) && s.Key.Length == 11 select s;
+            int wx = unique.Count(g => g.Mobile.Length != 11);
+            var sendlist = from s in unique where !td.Any(ss => ss.Mobile.Equals(s.Mobile)) && s.Mobile.Length == 11 select s;
             i = i + wx;
             LogUtil.WriteLog(string.Format("无效数量：{0}", i.ToString()));
             int n = sendlist.Count();
@@ -258,7 +280,7 @@ namespace Auto_BL.Models
                     send.Send_IsOver = true;
                     send.Send_IsPersonalized = true;
                     send.Send_IsTD = false;
-                    send.Send_Mobile = item.Key;
+                    send.Send_Mobile = item.Mobile;
                     send.Send_NeedReply = false;
                     send.Send_QuestionId = 0;
                     send.Send_ReplyFlag = false;
@@ -278,7 +300,7 @@ namespace Auto_BL.Models
             }
             LogUtil.WriteLog("Task  解析结束");
             string body = string.Format("你好，本次自动化数据处理结果如下：<br />总数：{0}<br />TD数量：{1}<br />无效数量：{2}<br />重复数量：{3}<br />发送数量：{4}<br />发送时间：{5}", totalCount.ToString(), u.ToString(), i.ToString(),  m.ToString(), n.ToString(), sendTime);
-            HttpUtil.SendByFocusSend("Post Purchase Survey Auto SMS Notification", body);
+            HttpUtil.SendByFocusSend("Beauty Loyalty Bi-weekly Automation SMS", body);
             string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n重复数量：{3}\n发送数量：{4}\n发送时间：{5}", totalCount.ToString(), u.ToString(), i.ToString(),  m.ToString(), n.ToString(), sendTime);
             HttpUtil.SendSMS(contents);
         }
