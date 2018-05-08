@@ -199,17 +199,23 @@ namespace Auto_BL.Models
                             i++;
                             //尊称空值不处理
                         }
+                        else if (!HttpUtil.IsDateTime(dr["Cut Off Date"].ToString()))
+                        {
+                            //日期格式不对的
+                            i++;
+                        }
                         else
                         {
+
                             String copy = dic[dr["Current Tier"].ToString()];
-                            string cos_spend = dr["COS_Spend"].ToString().Length <= 3 ? dr["COS_Spend"].ToString() : Int32.Parse(dr["COS_Spend"].ToString()).ToString("N0");
-                            string spend_to_next = dr["Spending to Next Tier"].ToString().Length <= 3 ? dr["Spending to Next Tier"].ToString() : Int32.Parse(dr["Spending to Next Tier"].ToString()).ToString("N0");
+                            string cos_spend = dr["COS_Spend"].ToString().Length <= 3 ? Int32.Parse(dr["COS_Spend"].ToString()).ToString() : Int32.Parse(dr["COS_Spend"].ToString()).ToString("N0");
+                            string spend_to_next = dr["Spending to Next Tier"].ToString().Length <= 3 ? Int32.Parse(dr["Spending to Next Tier"].ToString()).ToString() : Int32.Parse(dr["Spending to Next Tier"].ToString()).ToString("N0");
                             if (copy != null)
                             {
                                 string title = dr["last_name_eng"].ToString() + dr["title_adj"].ToString();
                                 if (string.IsNullOrWhiteSpace(dr["last_name_eng"].ToString()) && !string.IsNullOrWhiteSpace(dr["last_name_chi"].ToString()))
                                 {
-                                    title= dr["last_name_chi"].ToString() + dr["title_adj"].ToString();
+                                    title = dr["last_name_chi"].ToString() + dr["title_adj"].ToString();
                                 }
                                 copy = copy.Replace("[Last Name][Title]", title);
                                 copy = copy.Replace("[Cut Off Date]", dr["Cut Off Date"].ToString());
@@ -262,6 +268,7 @@ namespace Auto_BL.Models
             int u = unique.Count() - n - wx;
             LogUtil.WriteLog(string.Format("TD数量：{0}", u.ToString()));
             DateTime time = DateTime.Now;
+            string sendTitle= "Automation" + DateTime.Now.ToString("yyyyMMdd");
             if (sendlist.Count() > 0)
             {
                 foreach (var item in sendlist)
@@ -292,7 +299,7 @@ namespace Auto_BL.Models
                     send.Send_SubmitResult = "";
                     send.Send_Test = false;
                     send.Send_Time = sendTime;
-                    send.Send_Title = "Automation" + DateTime.Now.ToString("yyyyMM");
+                    send.Send_Title = sendTitle;
                     repository.Add<Models.YM_SendList>(send);
 
                 }
