@@ -270,6 +270,7 @@ namespace AutoSMS.Code
             u = unique.Count - n;
             log.WriteLog(string.Format("TD数量：{0}", u.ToString()));
             DateTime time = DateTime.Now;
+            string sendTitle= "Automation" + DateTime.Now.ToString("yyyyMM");
             foreach (var item in sendlist)
             {
                 YM_SendList send = new YM_SendList();
@@ -298,7 +299,7 @@ namespace AutoSMS.Code
                 send.Send_SubmitResult = "";
                 send.Send_Test = false;
                 send.Send_Time = sendTime;
-                send.Send_Title = "Automation" + DateTime.Now.ToString("yyyyMM");
+                send.Send_Title = sendTitle;
                 repository.Add<YM_SendList>(send);
             }
             repository.UnitOfWork.SaveChanges();

@@ -288,7 +288,7 @@ namespace AutoSMS.Code
         #region SMS
         public  void SendSMS(string contents)
         {
-            contents = "【连卡佛】" + contents;
+            contents = "【连卡佛】" + contents+"\n/回TD退订"; ;
             XmlDocument pdoc = new XmlDocument();
             string xmlFile = System.AppDomain.CurrentDomain.BaseDirectory + @"Files\EmailList.xml";
             pdoc.Load(xmlFile);

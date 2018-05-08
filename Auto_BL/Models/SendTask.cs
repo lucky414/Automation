@@ -212,10 +212,10 @@ namespace Auto_BL.Models
                             string spend_to_next = dr["Spending to Next Tier"].ToString().Length <= 3 ? Int32.Parse(dr["Spending to Next Tier"].ToString()).ToString() : Int32.Parse(dr["Spending to Next Tier"].ToString()).ToString("N0");
                             if (copy != null)
                             {
-                                string title = dr["last_name_eng"].ToString() + dr["title_adj"].ToString();
-                                if (string.IsNullOrWhiteSpace(dr["last_name_eng"].ToString()) && !string.IsNullOrWhiteSpace(dr["last_name_chi"].ToString()))
+                                string title = dr["last_name_chi"].ToString() + dr["title_adj"].ToString();
+                                if (string.IsNullOrWhiteSpace(dr["last_name_chi"].ToString()) && !string.IsNullOrWhiteSpace(dr["last_name_eng"].ToString()))
                                 {
-                                    title = dr["last_name_chi"].ToString() + dr["title_adj"].ToString();
+                                    title = dr["last_name_eng"].ToString() + dr["title_adj"].ToString();
                                 }
                                 copy = copy.Replace("[Last Name][Title]", title);
                                 copy = copy.Replace("[Cut Off Date]", dr["Cut Off Date"].ToString());
@@ -308,6 +308,7 @@ namespace Auto_BL.Models
             LogUtil.WriteLog("Task  解析结束");
             string body = string.Format("你好，本次自动化数据处理结果如下：<br />总数：{0}<br />TD数量：{1}<br />无效数量：{2}<br />重复数量：{3}<br />发送数量：{4}<br />发送时间：{5}", totalCount.ToString(), u.ToString(), i.ToString(),  m.ToString(), n.ToString(), sendTime);
             HttpUtil.SendByFocusSend("Beauty Loyalty Bi-weekly Automation SMS", body);
+            HttpUtil.SendEmailBy465("Automation SMS", body);
             string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n重复数量：{3}\n发送数量：{4}\n发送时间：{5}", totalCount.ToString(), u.ToString(), i.ToString(),  m.ToString(), n.ToString(), sendTime);
             HttpUtil.SendSMS(contents);
         }

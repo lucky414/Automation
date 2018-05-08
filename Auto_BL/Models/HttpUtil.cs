@@ -463,11 +463,38 @@ namespace Auto_BL.Models
             }
 
         }
+        public static void SendEmailBy465(string subject, string body)
+        {
+            System.Web.Mail.MailMessage mail = new System.Web.Mail.MailMessage();
+            try
+            {
+                mail.To = "kaibin.xu@lead2win.com.cn";
+                mail.From = "kaibin.xu@lead2win.com.cn";
+                mail.Subject = subject;
+                mail.BodyFormat = System.Web.Mail.MailFormat.Html;
+                mail.Body = body;
+
+                mail.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpauthenticate", "1"); //身份验证  
+                mail.Fields.Add("http://schemas.microsoft.com/cdo/configuration/sendusername", mail.From); //邮箱登录账号，这里跟前面的发送账号一样就行  
+                mail.Fields.Add("http://schemas.microsoft.com/cdo/configuration/sendpassword", "1q2w3e4r,."); //这个密码要注意：如果是一般账号，要用授权码；企业账号用登录密码  
+                mail.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpserverport", 465);//端口  
+                mail.Fields.Add("http://schemas.microsoft.com/cdo/configuration/smtpusessl", "true");//SSL加密  
+                System.Web.Mail.SmtpMail.SmtpServer = "smtp.exmail.qq.com";    //企业账号用smtp.exmail.qq.com  
+                System.Web.Mail.SmtpMail.Send(mail);
+
+                //邮件发送成功  
+            }
+            catch (Exception ex)
+            {
+                LogUtil.WriteLog(string.Format("465邮件发送失败：{0}", ex.Message));
+                //失败，错误信息：ex.Message;  
+            }
+        }
         #endregion
         #region SMS
         public static void SendSMS(string contents)
         {
-            contents = "【连卡佛】" + contents;
+            contents = "【连卡佛】" + contents+ "\n/回TD退订";
             XmlDocument pdoc = new XmlDocument();
             string xmlFile = System.AppDomain.CurrentDomain.BaseDirectory + @"Files\EmailList.xml";
             pdoc.Load(xmlFile);
