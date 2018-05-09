@@ -24,6 +24,7 @@ namespace Auto_BL
             Task.Factory.StartNew(() => {
                 SendTask t1 = new SendTask();
                 t1.Init();
+                
             });
         }
 

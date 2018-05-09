@@ -1,4 +1,5 @@
 ﻿using Auto_BL.com.focussend.app;
+using CDO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -416,7 +417,7 @@ namespace Auto_BL.Models
                 return false;
             }
         }
-        public static void SendByFocusSend(string subject, string body)
+        public static void SendBy_FocusSend(string subject, string body)
         {
             FocusSendWebService webService = new FocusSendWebService();
             FocusUser user = new FocusUser();
@@ -465,10 +466,22 @@ namespace Auto_BL.Models
         }
         public static void SendEmailBy465(string subject, string body)
         {
+            XmlDocument pdoc = new XmlDocument();
+            string xmlFile = System.AppDomain.CurrentDomain.BaseDirectory + @"Files\EmailList.xml";
+            pdoc.Load(xmlFile);
+
+            XmlNodeList nodeList = pdoc.SelectNodes("root/email");
+            StringBuilder to = new StringBuilder();
+            foreach (XmlNode node in nodeList)
+            {
+                to.AppendFormat("{0};", node.InnerText);
+            }
+            string toMail= to.ToString().TrimEnd(';');
+            //微软自带的System.Net.Mail不支持QQ邮箱这样的加密的SSL，授权码，
             System.Web.Mail.MailMessage mail = new System.Web.Mail.MailMessage();
             try
             {
-                mail.To = "kaibin.xu@lead2win.com.cn";
+                mail.To = toMail;//以分号分隔的收件人的地址列表
                 mail.From = "kaibin.xu@lead2win.com.cn";
                 mail.Subject = subject;
                 mail.BodyFormat = System.Web.Mail.MailFormat.Html;
@@ -486,8 +499,46 @@ namespace Auto_BL.Models
             }
             catch (Exception ex)
             {
+                SendMailForSSL(subject, body, toMail);
                 LogUtil.WriteLog(string.Format("465邮件发送失败：{0}", ex.Message));
                 //失败，错误信息：ex.Message;  
+            }
+        }
+        public static void SendMailForSSL(string subject, string body,string to)
+        {
+            try
+            {
+                CDO.Message oMsg = new CDO.Message();
+                Configuration conf = new ConfigurationClass();
+                conf.Fields[CdoConfiguration.cdoSendUsingMethod].Value = CdoSendUsing.cdoSendUsingPort;
+                conf.Fields[CdoConfiguration.cdoSMTPAuthenticate].Value = CdoProtocolsAuthentication.cdoBasic;
+                conf.Fields[CdoConfiguration.cdoSMTPUseSSL].Value = true;
+                conf.Fields[CdoConfiguration.cdoSMTPServer].Value = "smtp.exmail.qq.com";//必填，而且要真实可用     
+                conf.Fields[CdoConfiguration.cdoSMTPServerPort].Value = 465;//465特有  
+                conf.Fields[CdoConfiguration.cdoSendEmailAddress].Value = "kaibin.xu@lead2win.com.cn";
+                conf.Fields[CdoConfiguration.cdoSendUserName].Value = "kaibin.xu@lead2win.com.cn";//真实的邮件地址     
+                conf.Fields[CdoConfiguration.cdoSendPassword].Value = "1q2w3e4r,.";   //为邮箱密码，必须真实     
+
+
+                conf.Fields.Update();
+
+                oMsg.Configuration = conf;
+
+                oMsg.TextBody = body;
+
+                oMsg.Subject = subject;
+                oMsg.From = "kaibin.xu@lead2win.com.cn";
+                oMsg.To = to;
+                //ADD attachment.  
+                //TODO: Change the path to the file that you want to attach.  
+                //oMsg.AddAttachment("C:\Hello.txt", "", "");  
+                //oMsg.AddAttachment("C:\Test.doc", "", "");  
+                oMsg.Send();
+            }
+            catch (System.Net.Mail.SmtpException ex)
+            {
+                LogUtil.WriteLog("SendMailForSSL error:" + ex.Message);
+                //throw ex;
             }
         }
         #endregion

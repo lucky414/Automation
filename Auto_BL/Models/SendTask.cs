@@ -23,14 +23,11 @@ namespace Auto_BL.Models
             string hh = System.Configuration.ConfigurationManager.AppSettings["StartHour"];
             string mm = System.Configuration.ConfigurationManager.AppSettings["StartMinute"];
             Registry registry = new Registry();
-            //registry.Schedule(() => Execute()).ToRunEvery(1).Days().At(Int32.Parse(hh), Int32.Parse(mm));
              registry.Schedule(() => Execute()).ToRunNow().AndEvery(1).Days().At(Int32.Parse(hh), Int32.Parse(mm));
             JobManager.Initialize(registry);
         }
         public void Execute()
         {
-
-           // string weekstr = DateTime.Now.DayOfWeek.ToString();
             LogUtil.WriteLog("Task Execute");
             try
             {
@@ -58,17 +55,16 @@ namespace Auto_BL.Models
                     string[] file = ftp.GetFileList(ftpFilePath);
                     if (file == null)
                     {
-                        HttpUtil.SendByFocusSend("Beauty Loyalty Bi-weekly Automation SMS", "FTP上未发现文件");
+                        HttpUtil.SendEmailBy465("Beauty Loyalty Bi-weekly Automation SMS", "FTP上未发现文件");
                         HttpUtil.SendSMS("FTP上未发现文件");
                     }
                     else if (file.Length > 1)
                     {
-                        HttpUtil.SendByFocusSend("Beauty Loyalty Bi-weekly Automation SMS", "文件夹内不止1份发送数据");
+                        HttpUtil.SendEmailBy465("Beauty Loyalty Bi-weekly Automation SMS", "文件夹内不止1份发送数据");
                         HttpUtil.SendSMS("文件夹内不止1份发送数据");
                     }
                     else
                     {
-                        // string filename = string.Format("CN_Beauty_Loyalty_{0}.csv", DateTime.Now.ToString("yyyy-MM-dd"));
                         string filename = file[0];
                         string info = string.Empty;
                         int exists = repository.Count<Models.FTP_FILE>(x => x.NAME.Equals(filename));
@@ -93,7 +89,7 @@ namespace Auto_BL.Models
                                 }
                                 else
                                 {
-                                    HttpUtil.SendByFocusSend("Beauty Loyalty Bi-weekly Automation SMS", "自动化文件数据为空");
+                                    HttpUtil.SendEmailBy465("Beauty Loyalty Bi-weekly Automation SMS", "自动化文件数据为空");
                                     HttpUtil.SendSMS("自动化文件数据为空");
                                 }
                             }
@@ -119,12 +115,6 @@ namespace Auto_BL.Models
             {
                 LogUtil.WriteLog("ParseDocument error：" + ex.Message);
             }
-            //if (weekstr.Equals("Thursday", StringComparison.OrdinalIgnoreCase))
-            //{
-            //    //每周四发
-            //    //SS18 Beauty Loyalty 20180419
-                
-            //}
         }
         private DataTable GetDataFromCSV(string path)
         {
@@ -301,14 +291,12 @@ namespace Auto_BL.Models
                     send.Send_Time = sendTime;
                     send.Send_Title = sendTitle;
                     repository.Add<Models.YM_SendList>(send);
-
                 }
                 repository.UnitOfWork.SaveChanges();
             }
             LogUtil.WriteLog("Task  解析结束");
             string body = string.Format("你好，本次自动化数据处理结果如下：<br />总数：{0}<br />TD数量：{1}<br />无效数量：{2}<br />重复数量：{3}<br />发送数量：{4}<br />发送时间：{5}", totalCount.ToString(), u.ToString(), i.ToString(),  m.ToString(), n.ToString(), sendTime);
-            HttpUtil.SendByFocusSend("Beauty Loyalty Bi-weekly Automation SMS", body);
-            HttpUtil.SendEmailBy465("Automation SMS", body);
+            HttpUtil.SendEmailBy465("Beauty Loyalty Bi-weekly Automation SMS", body);
             string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n重复数量：{3}\n发送数量：{4}\n发送时间：{5}", totalCount.ToString(), u.ToString(), i.ToString(),  m.ToString(), n.ToString(), sendTime);
             HttpUtil.SendSMS(contents);
         }
