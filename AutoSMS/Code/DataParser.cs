@@ -47,13 +47,24 @@ namespace AutoSMS.Code
                     dates.Add(node.InnerText);
                 }
                 string name = DateTime.Now.ToString("yyyy-MM-dd");
-                if (dates.Contains(DateTime.Now.ToString("yyyy-MM-dd")))
+                if (dates.Contains(name))
                 {
+                    string fileFolder = DateTime.Now.ToString("yyyyMM") + "/";
                     string filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", DateTime.Now.ToString("MM_yyyy"));
+                    if (name == "2018-05-31")
+                    {
+                        filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv","06_2018");
+                        fileFolder = "201806/";
+                    }
+                    else if (name == "2018-08-30")
+                    {
+                        filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", "09_2018");
+                        fileFolder = "201809/";
+                    }
                     int count = repository.Count<DataModel.LC_AUTOFILE>(x => x.FILENAME.ToLower().Equals(filename.ToLower()));
                     if (count == 0)
                     {
-                        ParseData();
+                        ParseData(fileFolder, filename);
                     }
 
                 }
@@ -68,11 +79,11 @@ namespace AutoSMS.Code
             }
            
         }
-        private void ParseData()
+        private void ParseData(string folder,string filename)
         {
             log.WriteLog("Parse Data");
             FtpTools ftp = new FtpTools();
-            string[] file = ftp.GetFileList(DateTime.Now.ToString("yyyyMM") + "/");
+            string[] file = ftp.GetFileList(folder);
             if (file == null)
             {
                 httper.SendByFocusSend("Post Purchase Survey Auto SMS Notification", "FTP上未发现文件");
@@ -80,8 +91,6 @@ namespace AutoSMS.Code
             }
             else
             {
-                string filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", DateTime.Now.ToString("MM_yyyy"));
-
                 bool exists = false;
                 foreach (string name in file.ToList())
                 {
@@ -94,8 +103,8 @@ namespace AutoSMS.Code
                 if (exists)
                 {
                     string info = string.Empty;
-                    string filePath = System.AppDomain.CurrentDomain.BaseDirectory+ "Files/" + DateTime.Now.ToString("yyyyMM");
-                    bool downresult = ftp.Download(filePath, filename,  DateTime.Now.ToString("yyyyMM") + "/", out info);
+                    string filePath = System.AppDomain.CurrentDomain.BaseDirectory+ "Files/" + folder.TrimEnd('/');
+                    bool downresult = ftp.Download(filePath, filename, folder, out info);
 
                     if (downresult)
                     {
