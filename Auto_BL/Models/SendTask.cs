@@ -246,20 +246,23 @@ namespace Auto_BL.Models
             // 提交发送
             var td = repository.GetAll<Models.TD_List>();
             var sendcount = repository.GetQuery<Models.FTP_FILE>(x => x.NAME.Equals(filename, StringComparison.OrdinalIgnoreCase));
-            var unique = from p in sendcount group p by new { Mobile=p.MOBILE,CommId=p.TIER} into g select new { g.Key.Mobile,g.Key.CommId, Copy = g.Max(p => p.COPY) };
-            int m = sendcount.Count() - unique.Count();
+            var _unique = from p in sendcount group p by new { Mobile=p.MOBILE,CommId=p.TIER} into g select new { g.Key.Mobile,g.Key.CommId, Copy = g.Max(p => p.COPY) };
+            var unique = _unique.ToList();
+            int m = sendcount.Count() - unique.Count;
             LogUtil.WriteLog(string.Format("重复数量：{0}",m.ToString()));
-            int wx = unique.Count(g => g.Mobile.Length != 11);
-            var sendlist = from s in unique where !td.Any(ss => ss.Mobile.Equals(s.Mobile)) && s.Mobile.Length == 11 select s;
+            int wx = unique.Where(x => x.Mobile.Length != 11).Count();
+
+            var _sendlist = from s in unique where !td.Any(ss => ss.Mobile.Equals(s.Mobile)) && s.Mobile.Length == 11 select s;
+            var sendlist = _sendlist.ToList();
             i = i + wx;
             LogUtil.WriteLog(string.Format("无效数量：{0}", i.ToString()));
-            int n = sendlist.Count();
+            int n = sendlist.Count;
             LogUtil.WriteLog(string.Format("发送数量：{0}", n.ToString()));
-            int u = unique.Count() - n - wx;
+            int u = unique.Count - n - wx;
             LogUtil.WriteLog(string.Format("TD数量：{0}", u.ToString()));
-            DateTime time = DateTime.Now;
+            DateTime time = DateTime.Now.AddHours(1);
             string sendTitle= "Automation" + DateTime.Now.ToString("yyyyMMdd");
-            if (sendlist.Count() > 0)
+            if (sendlist.Count > 0)
             {
                 foreach (var item in sendlist)
                 {
