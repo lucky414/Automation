@@ -178,7 +178,8 @@ namespace AutoSMS.Code
         {
             log.WriteLog("Task  开始解析");
             string smsid = DateTime.Now.ToString("yyyyMMddHHmmss");
-            DateTime sendTime = DateTime.Parse(DateTime.Now.AddDays(2).ToShortDateString()).AddHours(10);
+            int Spend_days = Int32.Parse(System.Configuration.ConfigurationManager.AppSettings["Spend_days"]);
+            DateTime sendTime = DateTime.Parse(DateTime.Now.AddDays(Spend_days).ToShortDateString()).AddHours(10);
             int totalCount = dt.Rows.Count;
             int i = 0; // 无效数据
             int j = 0;
