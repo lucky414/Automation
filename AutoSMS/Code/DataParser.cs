@@ -56,7 +56,7 @@ namespace AutoSMS.Code
                         filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv","06_2018");
                         fileFolder = "201806/";
                     }
-                    else if (name == "2018-08-30")
+                    else if (name == "2018-08-31")
                     {
                         filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", "09_2018");
                         fileFolder = "201809/";
