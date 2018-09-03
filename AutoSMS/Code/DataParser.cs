@@ -61,6 +61,11 @@ namespace AutoSMS.Code
                         filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", "09_2018");
                         fileFolder = "201809/";
                     }
+                    else if (name == "2018-11-30")
+                    {
+                        filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", "12_2018");
+                        fileFolder = "201812/";
+                    }
                     int count = repository.Count<DataModel.LC_AUTOFILE>(x => x.FILENAME.ToLower().Equals(filename.ToLower()));
                     if (count == 0)
                     {
