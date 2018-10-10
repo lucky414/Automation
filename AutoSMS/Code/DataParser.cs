@@ -36,47 +36,28 @@ namespace AutoSMS.Code
             log.WriteLog("Task Run");
             try
             {
-                XmlDocument pdoc = new XmlDocument();
-                string xmlFile = System.AppDomain.CurrentDomain.BaseDirectory + @"Files\Schedule.xml";
-                pdoc.Load(xmlFile);
 
-                XmlNodeList nodeList = pdoc.SelectNodes("root/date");
-                List<string> dates = new List<string>();
-                foreach (XmlNode node in nodeList)
-                {
-                    dates.Add(node.InnerText);
-                }
                 string name = DateTime.Now.ToString("yyyy-MM-dd");
-                if (dates.Contains(name))
-                {
-                    string fileFolder = DateTime.Now.ToString("yyyyMM") + "/";
-                    string filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", DateTime.Now.ToString("MM_yyyy"));
-                    if (name == "2018-05-31")
-                    {
-                        filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv","06_2018");
-                        fileFolder = "201806/";
-                    }
-                    else if (name == "2018-08-31")
-                    {
-                        filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", "09_2018");
-                        fileFolder = "201809/";
-                    }
-                    else if (name == "2018-11-30")
-                    {
-                        filename = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", "12_2018");
-                        fileFolder = "201812/";
-                    }
-                    int count = repository.Count<DataModel.LC_AUTOFILE>(x => x.FILENAME.ToLower().Equals(filename.ToLower()));
-                    if (count == 0)
-                    {
-                        ParseData(fileFolder, filename);
-                    }
+                string thisFolder = DateTime.Now.ToString("yyyyMM") + "/";
+                string nextFolder= DateTime.Now.AddMonths(1).ToString("yyyyMM") + "/";
+                string thisFileName = string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", DateTime.Now.ToString("MM_yyyy"));
+                string nextFileName= string.Format("Survey_SMS_CN_Vendor_{0}_B1.csv", DateTime.Now.AddMonths(1).ToString("MM_yyyy"));
 
+                int count = repository.Count<DataModel.LC_AUTOFILE>(x => x.FILENAME.ToLower().Equals(thisFileName.ToLower()));
+                if (count == 0)
+                {
+                    ParseData(thisFolder, thisFileName);
                 }
                 else
                 {
-                    log.WriteLog("不是发送日");
+                    count = repository.Count<DataModel.LC_AUTOFILE>(x => x.FILENAME.ToLower().Equals(nextFileName.ToLower()));
+                    if (count == 0)
+                    {
+                        ParseData(nextFolder, nextFileName);
+                    }
+                   
                 }
+
             }
             catch (Exception ex)
             {
@@ -84,33 +65,21 @@ namespace AutoSMS.Code
             }
            
         }
-        private void ParseData(string folder,string filename)
+        private void ParseData(string folder, string filename)
         {
-            log.WriteLog("Parse Data");
+            log.WriteLog(string.Format("Parse Data，Folder:{0}，FileName:{1}", folder, filename));
             FtpTools ftp = new FtpTools();
+          
             string[] file = ftp.GetFileList(folder);
-            if (file == null)
+            if (file != null)
             {
-                httper.SendByFocusSend("Post Purchase Survey Auto SMS Notification", "FTP上未发现文件");
-                httper.SendSMS("FTP上未发现文件");
-            }
-            else
-            {
-                bool exists = false;
-                foreach (string name in file.ToList())
+                string ftpFile = file[0];
+                if (ftpFile.Equals(filename, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (name.Equals(filename, StringComparison.OrdinalIgnoreCase))
-                    {
-                        exists = true;
-                        break;
-                    }
-                }
-                if (exists)
-                {
-                    string info = string.Empty;
-                    string filePath = System.AppDomain.CurrentDomain.BaseDirectory+ "Files/" + folder.TrimEnd('/');
-                    bool downresult = ftp.Download(filePath, filename, folder, out info);
 
+                    string info = string.Empty;
+                    string filePath = System.AppDomain.CurrentDomain.BaseDirectory + "Files/" + folder.TrimEnd('/');
+                    bool downresult = ftp.Download(filePath, filename, folder, out info);
                     if (downresult)
                     {
                         DataTable cstData = GetDataFromCSV(filePath + "/" + filename);
@@ -123,21 +92,24 @@ namespace AutoSMS.Code
                             catch (Exception ex)
                             {
                                 log.WriteLog("数据有误：" + ex.Message);
-               
+
                             }
 
                         }
                         else
                         {
                             httper.SendByFocusSend("Post Purchase Survey Auto SMS Notification", "自动化文件数据为空");
-                             httper.SendSMS("自动化文件数据为空");
+                            httper.SendSMS("自动化文件数据为空");
                         }
-
-
                     }
                 }
-
             }
+            else
+            {
+                log.WriteLog("没有文件");
+            }
+
+            
         }
         private DataTable GetDataFromCSV(string path)
         {
@@ -183,8 +155,12 @@ namespace AutoSMS.Code
         {
             log.WriteLog("Task  开始解析");
             string smsid = DateTime.Now.ToString("yyyyMMddHHmmss");
-            int Spend_days = Int32.Parse(System.Configuration.ConfigurationManager.AppSettings["Spend_days"]);
-            DateTime sendTime = DateTime.Parse(DateTime.Now.AddDays(Spend_days).ToShortDateString()).AddHours(10);
+            //int Spend_days = Int32.Parse(System.Configuration.ConfigurationManager.AppSettings["Spend_days"]);
+            //DateTime sendTime = DateTime.Parse(DateTime.Now.AddDays(Spend_days).ToShortDateString()).AddHours(10);
+            DateTime now = DateTime.Parse(DateTime.Now.ToShortDateString());
+            DateTime startWeek = now.AddDays(1 - Convert.ToInt32(now.DayOfWeek.ToString("d")));  //本周周一  
+            DateTime sendTime = startWeek.AddDays(5).AddHours(10);  //本周六10点 
+
             int totalCount = dt.Rows.Count;
             int i = 0; // 无效数据
             int j = 0;
