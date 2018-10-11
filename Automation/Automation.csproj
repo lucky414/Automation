@@ -324,6 +324,7 @@
     <Content Include="Models\DataModel.edmx.diagram">
       <DependentUpon>DataModel.edmx</DependentUpon>
     </Content>
+    <Content Include="Files\Survey_SMS_CN_Vendor_10_2018_B1.csv" />
     <None Include="Properties\PublishProfiles\auto.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

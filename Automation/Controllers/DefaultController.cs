@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
@@ -27,29 +28,98 @@ namespace Automation.Controllers
         }
         public ActionResult Index()
         {
-            string body = string.Format("你好，本次自动化数据处理结果如下：<br />总数：{0}<br />TD数量：{1}<br />无效数量：{2}<br />生成短链接失败数量：{3}<br />重复数量：{4}<br />发送数量：{5}<br />发送时间：{6}", "6515", "0", "0", "0", "0", "6515", "2018/7/14 10:00:00");
-            //httper.SendByFocusSend("Post Purchase Survey Auto SMS Notification", body);
-            //string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n生成短链接失败数量：{3}\n重复数量：{4}\n发送数量：{5}\n发送时间：{6}", totalCount.ToString(), u.ToString(), i.ToString(), j.ToString(), m.ToString(), n.ToString(), sendTime);
-            //httper.SendSMS(contents);
-            //string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n生成短链接失败数量：{3}\n重复数量：{4}\n发送数量：{5}\n发送时间：{6}", "6515", "0", "0", "0", "0", "6515", "2018/7/14 10:00:00");
-            //contents = "【连卡佛】" + contents + "\n/回TD退订";
-            //string sendUrl = "http://sdk4rptws.eucp.b2m.cn:8080/sdkproxy/sendsms.action";
-            //string sendKey = "6SDK-EMY-6688-KCZLS";
-            //string sendPwd = "304304";
-            //string mobile = "18621727650,18601797523,13162231668,13880737877";
-            //string param = "cdkey={0}&password={1}&phone={2}&message={3}&addserial=&smspriority=3";
-            //param = string.Format(param, sendKey, sendPwd, mobile, contents);
+            string file = Server.MapPath("~/Files/Survey_SMS_CN_Vendor_10_2018_B1.csv");
+            DataTable dt = GetDataFromCSV(file);
+            int i = 0;
+            int j = 0;
+            foreach (DataRow dr in dt.Rows)
+            {
+                try
+                {
+                    if (IsDateTime(dr["Expired date"].ToString()))
+                    {
+                        j++;
+                    }
+                    else
+                    {
+                        i++;
+                    }
 
-            //string result = HttpsPost(param, sendUrl);
-            List<string> to = new List<string>();
-            to.Add("kaibin.xu@lead2win.com.cn");
-            to.Add("bob.zhang@lead2win.com.cn");
-            to.Add("FrancescaTan@lanecrawford.com");
-            to.Add("RitaDeng@lanecrawford.com");
-            SendEmail(to, "Post Purchase Survey Auto SMS Notification", body);
+                }
+                catch (Exception ex)
+                {
+                    i++;
+                    
+                }
+
+            }
+            //string body = string.Format("你好，本次自动化数据处理结果如下：<br />总数：{0}<br />TD数量：{1}<br />无效数量：{2}<br />生成短链接失败数量：{3}<br />重复数量：{4}<br />发送数量：{5}<br />发送时间：{6}", "6515", "0", "0", "0", "0", "6515", "2018/7/14 10:00:00");
+            ////httper.SendByFocusSend("Post Purchase Survey Auto SMS Notification", body);
+            ////string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n生成短链接失败数量：{3}\n重复数量：{4}\n发送数量：{5}\n发送时间：{6}", totalCount.ToString(), u.ToString(), i.ToString(), j.ToString(), m.ToString(), n.ToString(), sendTime);
+            ////httper.SendSMS(contents);
+            ////string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n生成短链接失败数量：{3}\n重复数量：{4}\n发送数量：{5}\n发送时间：{6}", "6515", "0", "0", "0", "0", "6515", "2018/7/14 10:00:00");
+            ////contents = "【连卡佛】" + contents + "\n/回TD退订";
+            ////string sendUrl = "http://sdk4rptws.eucp.b2m.cn:8080/sdkproxy/sendsms.action";
+            ////string sendKey = "6SDK-EMY-6688-KCZLS";
+            ////string sendPwd = "304304";
+            ////string mobile = "18621727650,18601797523,13162231668,13880737877";
+            ////string param = "cdkey={0}&password={1}&phone={2}&message={3}&addserial=&smspriority=3";
+            ////param = string.Format(param, sendKey, sendPwd, mobile, contents);
+
+            ////string result = HttpsPost(param, sendUrl);
+            //List<string> to = new List<string>();
+            //to.Add("kaibin.xu@lead2win.com.cn");
+            //to.Add("bob.zhang@lead2win.com.cn");
+            //to.Add("FrancescaTan@lanecrawford.com");
+            //to.Add("RitaDeng@lanecrawford.com");
+            //SendEmail(to, "Post Purchase Survey Auto SMS Notification", body);
 
             return Content("ok");
             /// return View();
+        }
+        public bool IsDateTime(string date)
+        {
+            return Regex.IsMatch(date, "^((?<year>\\d{2,4})年)?(?<month>\\d{1,2})月((?<day>\\d{1,2})日)?$");
+        }
+        private DataTable GetDataFromCSV(string path)
+        {
+            DataTable dt = new DataTable();
+            using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
+            {
+                string strTitle = sr.ReadLine();
+
+                string[] strColumTitle = strTitle.Split(',');   //CVS 文件默认以逗号隔开
+                int column = strColumTitle.Length;
+                for (int i = 0; i < column; i++)
+                {
+
+                    dt.Columns.Add(strColumTitle[i]);
+
+                }
+
+                while (!sr.EndOfStream)
+                {
+
+                    string strTest = sr.ReadLine();
+
+                    string[] strTestAttribute = strTest.Split(',');
+
+                    DataRow dr = dt.NewRow();
+
+                    for (int i = 0; i < column; i++)
+                    {
+                        dr[strColumTitle[i]] = strTestAttribute[i];
+
+
+                    }
+                    dt.Rows.Add(dr);
+
+
+
+                }
+            }
+            return dt;
+
         }
         public  void SendEmail(List<string> mailTo,string subject, string body)
         {

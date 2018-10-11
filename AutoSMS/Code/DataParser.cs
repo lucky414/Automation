@@ -183,6 +183,7 @@ namespace AutoSMS.Code
                     else
                     {
                         i++;
+                        log.WriteLog(string.Format("{0}，日期无效", dr["phone_no"]));
                     }
            
                 }
@@ -202,6 +203,7 @@ namespace AutoSMS.Code
                 if (string.IsNullOrWhiteSpace(item.Expired_date) || string.IsNullOrWhiteSpace(item.URL) || string.IsNullOrWhiteSpace(item.print_name))
                 {
                     i++;
+                    log.WriteLog(string.Format("{0}，日期/URL/PRINTNAME为空",item.phone_no));
                 }
                 else
                 {
@@ -210,6 +212,7 @@ namespace AutoSMS.Code
                     if (string.IsNullOrEmpty(shorturl))
                     {
                         j++;
+                        log.WriteLog(string.Format("{0}，shorturl为空", item.phone_no));
                     }
                     else
                     {
