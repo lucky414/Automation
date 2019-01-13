@@ -23,7 +23,8 @@ namespace AutoSMS
             Task task1 = new Task((task) =>
             {
                 DataParser job = new DataParser();
-                job.Init();
+                 job.Init();
+                
             }, 1);
             task1.Start();
         }

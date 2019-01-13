@@ -28,31 +28,31 @@ namespace Automation.Controllers
         }
         public ActionResult Index()
         {
-            string file = Server.MapPath("~/Files/Survey_SMS_CN_Vendor_10_2018_B1.csv");
-            DataTable dt = GetDataFromCSV(file);
-            int i = 0;
-            int j = 0;
-            foreach (DataRow dr in dt.Rows)
-            {
-                try
-                {
-                    if (IsDateTime(dr["Expired date"].ToString()))
-                    {
-                        j++;
-                    }
-                    else
-                    {
-                        i++;
-                    }
+            //string file = Server.MapPath("~/Files/Survey_SMS_CN_Vendor_10_2018_B1.csv");
+            //DataTable dt = GetDataFromCSV(file);
+            //int i = 0;
+            //int j = 0;
+            //foreach (DataRow dr in dt.Rows)
+            //{
+            //    try
+            //    {
+            //        if (IsDateTime(dr["Expired date"].ToString()))
+            //        {
+            //            j++;
+            //        }
+            //        else
+            //        {
+            //            i++;
+            //        }
 
-                }
-                catch (Exception ex)
-                {
-                    i++;
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        i++;
                     
-                }
+            //    }
 
-            }
+            //}
             //string body = string.Format("你好，本次自动化数据处理结果如下：<br />总数：{0}<br />TD数量：{1}<br />无效数量：{2}<br />生成短链接失败数量：{3}<br />重复数量：{4}<br />发送数量：{5}<br />发送时间：{6}", "6515", "0", "0", "0", "0", "6515", "2018/7/14 10:00:00");
             ////httper.SendByFocusSend("Post Purchase Survey Auto SMS Notification", body);
             ////string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n生成短链接失败数量：{3}\n重复数量：{4}\n发送数量：{5}\n发送时间：{6}", totalCount.ToString(), u.ToString(), i.ToString(), j.ToString(), m.ToString(), n.ToString(), sendTime);
@@ -76,6 +76,37 @@ namespace Automation.Controllers
 
             return Content("ok");
             /// return View();
+        }
+        public ActionResult Test()
+        {
+
+            string smsid = DateTime.Now.ToString("yyyyMMddHHmmss");
+            DateTime now = DateTime.Parse(DateTime.Now.ToShortDateString());
+            DateTime startWeek = now.AddDays(1 - Convert.ToInt32(now.DayOfWeek.ToString("d")));  //本周周一  
+            DateTime sendTime = startWeek.AddDays(5).AddHours(10);  //本周六10点 
+            var totalList = repository.GetAll<LC_AUTOFILE>().Where(t=>t.FILENAME== "Survey_SMS_CN_Vendor_01_2019_B1.csv").ToList();
+            int totalCount = totalList.Count;
+            int i = 0; // 无效数据
+            int j = 0;
+            var files = totalList;
+            var urls = repository.GetAll<LC_SHORTURL>().Where(t => t.URL_FILENAME == "Survey_SMS_CN_Vendor_01_2019_B1.csv").ToList();
+
+            // 提交发送
+            var td = repository.GetAll<TD_List>().Select(t => t.Mobile).ToList();
+            var sendcount = urls.FindAll(t => !td.Contains(t.URL_MOBILE));
+            // td 名单中数据
+            var inTds = urls.Count - sendcount.Count;
+
+            // 发送列表
+            var sendList = sendcount.GroupBy(t => t.URL_MOBILE).Select(t => new { t.Key, Copy = t.Max(p => p.URL_COPY) }).ToList();
+            //重复数据
+            var repeats = sendcount.Count - sendList.Count;
+
+            DateTime time = DateTime.Now;
+            string sendTitle = "Automation" + DateTime.Now.ToString("yyyyMM");
+            string body = string.Format("你好，本次自动化数据处理结果如下：<br />总数：{0}<br />TD数量：{1}<br />无效数量：{2}<br />生成短链接失败数量：{3}<br />重复数量：{4}<br />发送数量：{5}<br />发送时间：{6}", totalCount.ToString(), inTds.ToString(), i.ToString(), j.ToString(), repeats.ToString(), sendList.Count.ToString(), sendTime);
+            string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n生成短链接失败数量：{3}\n重复数量：{4}\n发送数量：{5}\n发送时间：{6}", totalCount.ToString(), inTds.ToString(), i.ToString(), j.ToString(), repeats.ToString(), sendList.Count.ToString(), sendTime);
+            return Content($"{body}；{contents}");
         }
         public bool IsDateTime(string date)
         {

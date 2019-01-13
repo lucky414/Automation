@@ -25,11 +25,91 @@ namespace AutoSMS.Code
         public void Init()
         {
             log.WriteLog("Task Start");
-            string hh = System.Configuration.ConfigurationManager.AppSettings["StartHour"];
-            string mm = System.Configuration.ConfigurationManager.AppSettings["StartMinute"];
-            Registry registry = new Registry();
-            registry.Schedule(() => ParseDocument()).ToRunNow().AndEvery(1).Days().At(Int32.Parse(hh),Int32.Parse(mm));
-            JobManager.Initialize(registry);
+            var isManual= System.Configuration.ConfigurationManager.AppSettings["IsManual"];
+            if (isManual == "1")
+            {
+                SendByManual();
+            }
+            else
+            {
+                string hh = System.Configuration.ConfigurationManager.AppSettings["StartHour"];
+                string mm = System.Configuration.ConfigurationManager.AppSettings["StartMinute"];
+                Registry registry = new Registry();
+                registry.Schedule(() => ParseDocument()).ToRunNow().AndEvery(1).Days().At(Int32.Parse(hh), Int32.Parse(mm));
+                JobManager.Initialize(registry);
+            }
+        }
+        public void SendByManual()
+        {
+            log.WriteLog("Manual Start:"+DateTime.Now);
+            // 生成URL
+            try
+            {
+                var filename = System.Configuration.ConfigurationManager.AppSettings["FileName"];
+                var shortUrl = repository.GetQuery<LC_SHORTURL>(t => t.URL_FILENAME.Equals(filename, StringComparison.OrdinalIgnoreCase)).Select(t =>new { Mobile=t.URL_MOBILE, Copy=t.URL_COPY} ).ToList();
+
+                var list = repository.GetQuery<LC_AUTOFILE>(t => t.FILENAME.Equals(filename, StringComparison.OrdinalIgnoreCase)&&!shortUrl.Any(c=>c.Mobile == t.phone_no)).ToList();
+                var sendTime = DateTime.Parse(System.Configuration.ConfigurationManager.AppSettings["SendTime"]);
+                //var datatable = GetDataFromCSV(AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "Manual\\" + filename);
+                var i = 0;
+                var j = 0;
+               // var list=  InsertToAutoFile(datatable, filename,ref i);
+                var urls=  InsertToShortUrl(list, sendTime,ref j);
+                try
+                {
+                    var td = repository.GetAll<TD_List>().Select(t=>t.Mobile).ToList();
+                    var sendlist = urls.Where(t => !td.Contains(t.URL_MOBILE)).GroupBy(t => t.URL_MOBILE).Select(t => new { Mobile=t.Key, Copy = t.Max(c => c.URL_COPY) }).ToList();
+                    shortUrl.AddRange(sendlist);
+                    //shortUrl = shortUrl.Distinct().ToList();
+                    var smsid = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    DateTime time = DateTime.Now;
+                    string sendTitle = "Automation" + DateTime.Now.ToString("yyyyMM");
+                    foreach (var item in shortUrl)
+                    {
+                        YM_SendList send = new YM_SendList();
+                        send.Send_AccountId = 1;
+                        send.Send_Batch = 1;
+                        send.Send_CheckId = "Auto";
+                        send.Send_CheckStatus = false;
+                        send.Send_CheckTime = time;
+                        send.Send_Contents = item.Copy;
+                        send.Send_CreateId = 1;
+                        send.Send_CreateTime = time;
+                        send.Send_DataStatus = 1;
+                        send.Send_Flag = 1;
+                        send.Send_IsOver = true;
+                        send.Send_IsPersonalized = true;
+                        send.Send_IsTD = false;
+                        send.Send_Mobile = item.Mobile;
+                        send.Send_NeedReply = false;
+                        send.Send_QuestionId = 0;
+                        send.Send_ReplyFlag = false;
+                        send.Send_ReplyId = 0;
+                        send.Send_Result = "";
+                        send.Send_SMSID = long.Parse(smsid);
+                        send.Send_StartFlag = 0;
+                        send.Send_Status = false;
+                        send.Send_SubmitResult = "";
+                        send.Send_Test = false;
+                        send.Send_Time = sendTime;
+                        send.Send_Title = sendTitle;
+                        repository.Add<YM_SendList>(send);
+                    }
+                    repository.UnitOfWork.SaveChanges();
+                    log.WriteLog("Manual  End:" + DateTime.Now);
+                }
+                catch (Exception ex)
+                {
+                    log.WriteLog("保存失败:" + ex.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.WriteLog("Manual失败:" + ex.InnerException.Message);
+            }
+           
+           
+           
         }
         public void ParseDocument()
         {
@@ -164,108 +244,40 @@ namespace AutoSMS.Code
             int totalCount = dt.Rows.Count;
             int i = 0; // 无效数据
             int j = 0;
-            foreach (DataRow dr in dt.Rows)
-            {
-                try
-                {
-                    if (httper.IsDateTime(dr["Expired date"].ToString()))
-                    {
-                        LC_AUTOFILE auto = new LC_AUTOFILE();
-                        auto.print_name = dr.IsNull("print_name") ? string.Empty : dr["print_name"].ToString();
-                        auto.URL = dr.IsNull("URL") ? string.Empty : dr["URL"].ToString(); dr["URL"].ToString();
-                        auto.phone_no = dr.IsNull("phone_no") ? string.Empty : dr["phone_no"].ToString();
-                        auto.Expired_date = dr.IsNull("Expired date") ? string.Empty : dr["Expired date"].ToString();
-                        auto.FILENAME = filename;
-                        auto.CreateDate = DateTime.Now;
-                        repository.Add<LC_AUTOFILE>(auto);
-                        repository.UnitOfWork.SaveChanges();
-                    }
-                    else
-                    {
-                        i++;
-                        log.WriteLog(string.Format("{0}，日期无效", dr["phone_no"]));
-                    }
+            var files = InsertToAutoFile(dt, filename,ref i);
+            var urls = InsertToShortUrl(files, sendTime,ref j);
            
-                }
-                catch (Exception ex)
-                {
-                    i++;
-                    log.WriteLog(string.Format("{0}，写入AUTOFILE失败：{1}", dr["phone_no"], ex.Message));
-                }
-
-            }
-            // 生成URL
-  
-            var  shorturldata= repository.GetQuery<LC_AUTOFILE>(x => x.FILENAME.Equals(filename, StringComparison.OrdinalIgnoreCase)&&x.phone_no.Length==11);
-            var datalist = shorturldata.ToList();
-            foreach (var item in datalist)
-            {
-                if (string.IsNullOrWhiteSpace(item.Expired_date) || string.IsNullOrWhiteSpace(item.URL) || string.IsNullOrWhiteSpace(item.print_name))
-                {
-                    i++;
-                    log.WriteLog(string.Format("{0}，日期/URL/PRINTNAME为空",item.phone_no));
-                }
-                else
-                {
-
-                    string shorturl = CreateShortUrl(item.URL);
-                    if (string.IsNullOrEmpty(shorturl))
-                    {
-                        j++;
-                        log.WriteLog(string.Format("{0}，shorturl为空", item.phone_no));
-                    }
-                    else
-                    {
-                        try
-                        {
-                            LC_SHORTURL urlmodel = new LC_SHORTURL();
-                            string copy = string.Format("【连卡佛】尊敬的{0}，感谢您近期的光顾！诚邀您于{1}前完成购物体验调查 {2} /回TD退订", item.print_name, item.Expired_date, shorturl);
-                            urlmodel.URL_CREATETIME = DateTime.Now;
-                            urlmodel.URL_COPY = copy;
-                            urlmodel.URL_FILENAME = item.FILENAME;
-                            urlmodel.URL_DATE = item.Expired_date;
-                            urlmodel.URL_LONG = item.URL;
-                            urlmodel.URL_MOBILE = item.phone_no;
-                            urlmodel.URL_PRINTNAME = item.print_name;
-                            urlmodel.URL_SENDTIME = sendTime;
-                            urlmodel.URL_SHORT = shorturl;
-                            urlmodel.URL_VIPNO = item.vip_no;
-                            repository.Add<LC_SHORTURL>(urlmodel);
-                            repository.UnitOfWork.SaveChanges();
-                        }
-                        catch (Exception ex)
-                        {
-                            i++;
-                            log.WriteLog(string.Format("{0}，写入SHORTURL失败：{1}", item.phone_no, ex.Message));
-                        }
-
-                    }
-                }
-            }
             log.WriteLog(string.Format("生成短链接失败数量：{0}", j.ToString()));
            // int errormobile = totalCount - datalist.Count;
             //i += errormobile;
             log.WriteLog(string.Format("无效数量：{0}",i.ToString()));
             // 提交发送
-            var td = repository.GetAll<TD_List>().ToList();
-            var sendcount = repository.GetQuery<LC_SHORTURL>(x => x.URL_FILENAME.Equals(filename, StringComparison.OrdinalIgnoreCase)).ToList();
+            var td = repository.GetAll<TD_List>().Select(t=>t.Mobile).ToList();
+            var sendcount =urls.FindAll(t=>!td.Contains(t.URL_MOBILE));
+            // td 名单中数据
+            var inTds = urls.Count - sendcount.Count;
+            log.WriteLog(string.Format("td 名单中数据：{0}", inTds.ToString()));
+            // 发送列表
+            var sendList = sendcount.GroupBy(t => t.URL_MOBILE).Select(t => new { t.Key, Copy = t.Max(p => p.URL_COPY) }).ToList();
+            //重复数据
+            var repeats = sendcount.Count - sendList.Count;
+            log.WriteLog(string.Format("重复数量：{0}", repeats.ToString()));
+            // var _uni log.WriteLog(string.Format("重复数量：{0}", m.ToString()));que = from p in sendcount group p by p.URL_MOBILE into g select new { g.Key, Copy = g.Max(p => p.URL_COPY) };
+            //  var unique = _unique.ToList();
 
-            var _unique = from p in sendcount group p by p.URL_MOBILE into g select new { g.Key, Copy = g.Max(p => p.URL_COPY) };
-            var unique = _unique.ToList();
+            //int m = sendcount.Count - unique.Count;
+            //log.WriteLog(string.Format("重复数量：{0}", m.ToString()));
+            //var _sendlist = from s in unique where !td.Any(ss => ss.Mobile.Equals(s.Key)) select s;
+            //var sendlist = _sendlist.ToList();
 
-            int m = sendcount.Count - unique.Count;
-            log.WriteLog(string.Format("重复数量：{0}", m.ToString()));
-            var _sendlist = from s in unique where !td.Any(ss => ss.Mobile.Equals(s.Key)) select s;
-            var sendlist = _sendlist.ToList();
-
-            int n = 0, u = 0;
-            n = sendlist.Count();
-            log.WriteLog(string.Format("发送数量：{0}",n.ToString()));
-            u = unique.Count - n;
-            log.WriteLog(string.Format("TD数量：{0}", u.ToString()));
+            //int n = 0, u = 0;
+            //n = sendlist.Count();
+            log.WriteLog(string.Format("发送数量：{0}", sendList.Count.ToString()));
+            //u = unique.Count - n;
+           // log.WriteLog(string.Format("TD数量：{0}", u.ToString()));
             DateTime time = DateTime.Now;
             string sendTitle= "Automation" + DateTime.Now.ToString("yyyyMM");
-            foreach (var item in sendlist)
+            foreach (var item in sendList)
             {
                 YM_SendList send = new YM_SendList();
                 send.Send_AccountId = 1;
@@ -298,19 +310,121 @@ namespace AutoSMS.Code
             }
             repository.UnitOfWork.SaveChanges();
             log.WriteLog("Task  解析结束");
-            string body = string.Format("你好，本次自动化数据处理结果如下：<br />总数：{0}<br />TD数量：{1}<br />无效数量：{2}<br />生成短链接失败数量：{3}<br />重复数量：{4}<br />发送数量：{5}<br />发送时间：{6}", totalCount.ToString(), u.ToString(), i.ToString(), j.ToString(), m.ToString(), n.ToString(), sendTime);
+            string body = string.Format("你好，本次自动化数据处理结果如下：<br />总数：{0}<br />TD数量：{1}<br />无效数量：{2}<br />生成短链接失败数量：{3}<br />重复数量：{4}<br />发送数量：{5}<br />发送时间：{6}", totalCount.ToString(),inTds.ToString(), i.ToString(), j.ToString(), repeats.ToString(), sendList.Count.ToString(), sendTime);
             httper.SendByFocusSend("Post Purchase Survey Auto SMS Notification", body);
-            string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n生成短链接失败数量：{3}\n重复数量：{4}\n发送数量：{5}\n发送时间：{6}", totalCount.ToString(), u.ToString(), i.ToString(), j.ToString(), m.ToString(), n.ToString(), sendTime);
+            string contents = string.Format("你好，本次自动化数据处理结果如下：\n总数：{0}\nTD数量：{1}\n无效数量：{2}\n生成短链接失败数量：{3}\n重复数量：{4}\n发送数量：{5}\n发送时间：{6}", totalCount.ToString(), inTds.ToString(), i.ToString(), j.ToString(), repeats.ToString(), sendList.Count.ToString(), sendTime);
             httper.SendSMS(contents);
 
         }
+        private List<LC_AUTOFILE> InsertToAutoFile(DataTable dt,string filename,ref int i)
+        {
+            var list = new List<LC_AUTOFILE>();
+            if (dt == null || dt.Rows.Count == 0) return list;
+            foreach (DataRow dr in dt.Rows)
+            {
+                
+                try
+                {
+                    
+                    if (httper.IsDateTime(dr["Expired date"].ToString()))
+                    {
+                        LC_AUTOFILE auto = new LC_AUTOFILE();
+                        auto.print_name = dr.IsNull("print_name") ? string.Empty : dr["print_name"].ToString();
+                        auto.URL = dr.IsNull("URL") ? string.Empty : dr["URL"].ToString(); dr["URL"].ToString();
+                        auto.phone_no = dr.IsNull("phone_no") ? string.Empty : dr["phone_no"].ToString();
+                        auto.Expired_date = dr.IsNull("Expired date") ? string.Empty : dr["Expired date"].ToString();
+                        auto.FILENAME = filename;
+                        auto.CreateDate = DateTime.Now;
+                        list.Add(auto);
+                        repository.Add<LC_AUTOFILE>(auto);
+                        repository.UnitOfWork.SaveChanges();
+                    }
+                    else
+                    {
+                        i++;
+                        log.WriteLog(string.Format("{0}，日期无效", dr["phone_no"]));
+                    }
+                   
+
+                }
+                catch (Exception ex)
+                {
+                    i++;
+                    log.WriteLog(string.Format("{0}，写入AUTOFILE失败：{1}", dr["phone_no"], ex.Message));
+                    return new List<LC_AUTOFILE>();
+                }
+               
+            }
+              return list;
+        }
+        private List<LC_SHORTURL> InsertToShortUrl(List<LC_AUTOFILE> list,DateTime sendTime,ref int j)
+        {
+            var urls = new List<LC_SHORTURL>();
+            if (list.Count == 0) return urls;
+            foreach (var item in list)
+            {
+                if (string.IsNullOrWhiteSpace(item.Expired_date) || string.IsNullOrWhiteSpace(item.URL) || string.IsNullOrWhiteSpace(item.print_name))
+                {
+                    j++;
+   
+                    log.WriteLog(string.Format("{0}，日期/URL/PRINTNAME为空", item.phone_no));
+                }
+                else
+                {
+
+                    string shorturl = CreateShortUrl(item.URL);
+                    if (string.IsNullOrEmpty(shorturl))
+                    {
+                        j++;
+                        log.WriteLog(string.Format("{0}，shorturl为空", item.phone_no));
+                    }
+                    else
+                    {
+                        try
+                        {
+                            LC_SHORTURL urlmodel = new LC_SHORTURL();
+                            string copy = string.Format("【连卡佛】尊敬的{0}，感谢您近期的光顾！诚邀您于{1}前完成购物体验调查 {2} /回TD退订", item.print_name, item.Expired_date, shorturl);
+                            urlmodel.URL_CREATETIME = DateTime.Now;
+                            urlmodel.URL_COPY = copy;
+                            urlmodel.URL_FILENAME = item.FILENAME;
+                            urlmodel.URL_DATE = item.Expired_date;
+                            urlmodel.URL_LONG = item.URL;
+                            urlmodel.URL_MOBILE = item.phone_no;
+                            urlmodel.URL_PRINTNAME = item.print_name;
+                            urlmodel.URL_SENDTIME = sendTime;
+                            urlmodel.URL_SHORT = shorturl;
+                            urlmodel.URL_VIPNO = item.vip_no;
+                            urls.Add(urlmodel);
+                            repository.Add<LC_SHORTURL>(urlmodel);
+                            repository.UnitOfWork.SaveChanges();
+                        }
+                        catch (Exception ex)
+                        {
+                            j++;
+                            log.WriteLog(string.Format("{0}，写入SHORTURL失败：{1}", item.phone_no, ex.Message));
+                        }
+
+                    }
+                }
+            }
+            return urls;
+        }
         private string CreateShortUrl(string longurl)
         {
-            string api_url = "http://l-c.co/yourls-api.php";
-            string short_url = string.Empty;
-            string param = string.Format("username={0}&password={1}&action={2}&url={3}&title={4}&format={5}", "lead2win", "bu9OtPz9", "shorturl", HttpUtility.UrlEncode(longurl.Trim()), "lead2win", "simple");
-            short_url = httper.HttpGet(api_url, param, "application/x-www-form-urlencoded");
-            return short_url;
+            try
+            {
+                string api_url = "http://l-c.co/yourls-api.php";
+                string short_url = string.Empty;
+                string param = string.Format("username={0}&password={1}&action={2}&url={3}&title={4}&format={5}", "lead2win", "bu9OtPz9", "shorturl", HttpUtility.UrlEncode(longurl.Trim()), "lead2win", "simple");
+                short_url = httper.HttpGet(api_url, param, "application/x-www-form-urlencoded");
+                return short_url;
+            }
+            catch(Exception ex)
+            {
+                log.WriteLog(string.Format("生成短链接失败：{0}", ex.Message));
+                return string.Empty;
+            }
+ 
         }
     }
 }
