@@ -1,0 +1,342 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="BFSMSDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="TD_List">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Mobile" Type="nvarchar" MaxLength="20" />
+          <Property Name="Conetents" Type="nvarchar" MaxLength="200" />
+          <Property Name="Dates" Type="datetime" />
+          <Property Name="Types" Type="nvarchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="YM_SendList">
+          <Key>
+            <PropertyRef Name="Send_Id" />
+          </Key>
+          <Property Name="Send_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Send_Title" Type="nvarchar" MaxLength="100" />
+          <Property Name="Send_Mobile" Type="nvarchar" MaxLength="20" />
+          <Property Name="Send_Contents" Type="nvarchar" MaxLength="1000" />
+          <Property Name="Send_TextID" Type="int" />
+          <Property Name="Send_Time" Type="datetime" />
+          <Property Name="Send_Status" Type="bit" />
+          <Property Name="Send_AccountId" Type="int" />
+          <Property Name="Send_NeedReply" Type="bit" />
+          <Property Name="Send_ReplyId" Type="int" />
+          <Property Name="Send_ReplyFlag" Type="bit" />
+          <Property Name="Send_Result" Type="nvarchar" MaxLength="1000" />
+          <Property Name="Send_Flag" Type="int" />
+          <Property Name="Send_SMSID" Type="bigint" />
+          <Property Name="Send_Test" Type="bit" />
+          <Property Name="Send_ReplyTemplateId" Type="int" />
+          <Property Name="Send_IsTD" Type="bit" />
+          <Property Name="Send_CreateId" Type="int" />
+          <Property Name="Send_CreateTime" Type="datetime" />
+          <Property Name="Send_UpdateId" Type="int" />
+          <Property Name="Send_UpdateDate" Type="datetime" />
+          <Property Name="Send_DataStatus" Type="int" />
+          <Property Name="Send_IsPersonalized" Type="bit" />
+          <Property Name="Send_Batch" Type="int" />
+          <Property Name="Send_ApiID" Type="nvarchar" MaxLength="50" />
+          <Property Name="Send_ReplyIsTrue" Type="bit" />
+          <Property Name="Send_ReportDate" Type="datetime" />
+          <Property Name="Send_CheckStatus" Type="bit" />
+          <Property Name="Send_CheckId" Type="nvarchar" MaxLength="20" />
+          <Property Name="Send_CheckTime" Type="datetime" />
+          <Property Name="Send_QuestionId" Type="int" />
+          <Property Name="Send_IsOver" Type="bit" Nullable="false" />
+          <Property Name="Send_StartFlag" Type="int" Nullable="false" />
+          <Property Name="Send_SubmitResult" Type="nvarchar" MaxLength="50" />
+          <Property Name="Seeding" Type="varchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="POSTSURVEY_FILES">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FileName" Type="varchar" MaxLength="100" />
+          <Property Name="user_id" Type="varchar" MaxLength="100" />
+          <Property Name="card_type_datamart" Type="varchar" MaxLength="100" />
+          <Property Name="Title" Type="varchar" MaxLength="100" />
+          <Property Name="First_Name" Type="varchar" MaxLength="100" />
+          <Property Name="Last_Name" Type="varchar" MaxLength="100" />
+          <Property Name="customer_name_shortened_chi" Type="varchar" MaxLength="100" />
+          <Property Name="phone_country_code" Type="varchar" MaxLength="100" />
+          <Property Name="phone_area_code" Type="varchar" MaxLength="100" />
+          <Property Name="phone_no" Type="varchar" MaxLength="100" />
+          <Property Name="cust_type" Type="varchar" MaxLength="100" />
+          <Property Name="recent_store" Type="varchar" MaxLength="100" />
+          <Property Name="COMM_ID" Type="varchar" MaxLength="100" />
+          <Property Name="URL" Type="varchar" MaxLength="1000" />
+          <Property Name="Seeding" Type="varchar" MaxLength="100" />
+          <Property Name="Expired_date" Type="varchar" MaxLength="100" />
+          <Property Name="DownLoadTime" Type="datetime" />
+          <Property Name="Short_Url" Type="varchar" MaxLength="100" />
+          <Property Name="Copy" Type="varchar" MaxLength="1000" />
+        </EntityType>
+        <EntityType Name="POSTSURVEY_LOG">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FILENAME" Type="varchar" MaxLength="100" />
+          <Property Name="DOWNLAODTIME" Type="datetime" />
+        </EntityType>
+        <EntityType Name="POSTSURVEY_SHORTURL">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FILE_ID" Type="int" />
+          <Property Name="COPY" Type="varchar" MaxLength="1000" />
+          <Property Name="LONG_URL" Type="varchar" MaxLength="1000" />
+          <Property Name="SHORT_URL" Type="varchar" MaxLength="100" />
+          <Property Name="CREATETIME" Type="datetime" />
+        </EntityType>
+        <EntityContainer Name="BFSMSDBModelStoreContainer">
+          <EntitySet Name="TD_List" EntityType="Self.TD_List" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="YM_SendList" EntityType="Self.YM_SendList" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="POSTSURVEY_FILES" EntityType="Self.POSTSURVEY_FILES" Schema="LC" store:Type="Tables" />
+          <EntitySet Name="POSTSURVEY_LOG" EntityType="Self.POSTSURVEY_LOG" Schema="LC" store:Type="Tables" />
+          <EntitySet Name="POSTSURVEY_SHORTURL" EntityType="Self.POSTSURVEY_SHORTURL" Schema="LC" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BFSMSDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="POSTSURVEY_FILES">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FileName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="user_id" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="card_type_datamart" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Title" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="First_Name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Last_Name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="customer_name_shortened_chi" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="phone_country_code" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="phone_area_code" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="phone_no" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="cust_type" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="recent_store" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="COMM_ID" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="URL" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="Seeding" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Expired_date" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="DownLoadTime" Type="DateTime" Precision="3" />
+          <Property Name="Short_Url" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Copy" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="POSTSURVEY_LOG">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FILENAME" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="DOWNLAODTIME" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="POSTSURVEY_SHORTURL">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FILE_ID" Type="Int32" />
+          <Property Name="COPY" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="LONG_URL" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="SHORT_URL" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CREATETIME" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityContainer Name="BFSMSDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="POSTSURVEY_FILES" EntityType="Self.POSTSURVEY_FILES" />
+          <EntitySet Name="POSTSURVEY_LOG" EntityType="Self.POSTSURVEY_LOG" />
+          <EntitySet Name="POSTSURVEY_SHORTURL" EntityType="Self.POSTSURVEY_SHORTURL" />
+          <EntitySet Name="YM_SendList" EntityType="BFSMSDBModel.YM_SendList" />
+          <EntitySet Name="TD_List" EntityType="BFSMSDBModel.TD_List" />
+        </EntityContainer>
+        <EntityType Name="YM_SendList">
+          <Key>
+            <PropertyRef Name="Send_Id" />
+          </Key>
+          <Property Name="Send_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Send_Title" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Send_Mobile" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Send_Contents" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="Send_TextID" Type="Int32" />
+          <Property Name="Send_Time" Type="DateTime" Precision="3" />
+          <Property Name="Send_Status" Type="Boolean" />
+          <Property Name="Send_AccountId" Type="Int32" />
+          <Property Name="Send_NeedReply" Type="Boolean" />
+          <Property Name="Send_ReplyId" Type="Int32" />
+          <Property Name="Send_ReplyFlag" Type="Boolean" />
+          <Property Name="Send_Result" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="Send_Flag" Type="Int32" />
+          <Property Name="Send_SMSID" Type="Int64" />
+          <Property Name="Send_Test" Type="Boolean" />
+          <Property Name="Send_ReplyTemplateId" Type="Int32" />
+          <Property Name="Send_IsTD" Type="Boolean" />
+          <Property Name="Send_CreateId" Type="Int32" />
+          <Property Name="Send_CreateTime" Type="DateTime" Precision="3" />
+          <Property Name="Send_UpdateId" Type="Int32" />
+          <Property Name="Send_UpdateDate" Type="DateTime" Precision="3" />
+          <Property Name="Send_DataStatus" Type="Int32" />
+          <Property Name="Send_IsPersonalized" Type="Boolean" />
+          <Property Name="Send_Batch" Type="Int32" />
+          <Property Name="Send_ApiID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Send_ReplyIsTrue" Type="Boolean" />
+          <Property Name="Send_ReportDate" Type="DateTime" Precision="3" />
+          <Property Name="Send_CheckStatus" Type="Boolean" />
+          <Property Name="Send_CheckId" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Send_CheckTime" Type="DateTime" Precision="3" />
+          <Property Name="Send_QuestionId" Type="Int32" />
+          <Property Name="Send_IsOver" Type="Boolean" Nullable="false" />
+          <Property Name="Send_StartFlag" Type="Int32" Nullable="false" />
+          <Property Name="Send_SubmitResult" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Seeding" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="TD_List">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Mobile" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Conetents" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Dates" Type="DateTime" Precision="3" />
+          <Property Name="Types" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="BFSMSDBModelStoreContainer" CdmEntityContainer="BFSMSDBEntities">
+          <EntitySetMapping Name="POSTSURVEY_FILES">
+            <EntityTypeMapping TypeName="BFSMSDBModel.POSTSURVEY_FILES">
+              <MappingFragment StoreEntitySet="POSTSURVEY_FILES">
+                <ScalarProperty Name="Copy" ColumnName="Copy" />
+                <ScalarProperty Name="Short_Url" ColumnName="Short_Url" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="card_type_datamart" ColumnName="card_type_datamart" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="First_Name" ColumnName="First_Name" />
+                <ScalarProperty Name="Last_Name" ColumnName="Last_Name" />
+                <ScalarProperty Name="customer_name_shortened_chi" ColumnName="customer_name_shortened_chi" />
+                <ScalarProperty Name="phone_country_code" ColumnName="phone_country_code" />
+                <ScalarProperty Name="phone_area_code" ColumnName="phone_area_code" />
+                <ScalarProperty Name="phone_no" ColumnName="phone_no" />
+                <ScalarProperty Name="cust_type" ColumnName="cust_type" />
+                <ScalarProperty Name="recent_store" ColumnName="recent_store" />
+                <ScalarProperty Name="COMM_ID" ColumnName="COMM_ID" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="Seeding" ColumnName="Seeding" />
+                <ScalarProperty Name="Expired_date" ColumnName="Expired_date" />
+                <ScalarProperty Name="DownLoadTime" ColumnName="DownLoadTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="POSTSURVEY_LOG">
+            <EntityTypeMapping TypeName="BFSMSDBModel.POSTSURVEY_LOG">
+              <MappingFragment StoreEntitySet="POSTSURVEY_LOG">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="FILENAME" ColumnName="FILENAME" />
+                <ScalarProperty Name="DOWNLAODTIME" ColumnName="DOWNLAODTIME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="POSTSURVEY_SHORTURL">
+            <EntityTypeMapping TypeName="BFSMSDBModel.POSTSURVEY_SHORTURL">
+              <MappingFragment StoreEntitySet="POSTSURVEY_SHORTURL">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="FILE_ID" ColumnName="FILE_ID" />
+                <ScalarProperty Name="COPY" ColumnName="COPY" />
+                <ScalarProperty Name="LONG_URL" ColumnName="LONG_URL" />
+                <ScalarProperty Name="SHORT_URL" ColumnName="SHORT_URL" />
+                <ScalarProperty Name="CREATETIME" ColumnName="CREATETIME" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="YM_SendList">
+            <EntityTypeMapping TypeName="BFSMSDBModel.YM_SendList">
+              <MappingFragment StoreEntitySet="YM_SendList">
+                <ScalarProperty Name="Seeding" ColumnName="Seeding" />
+                <ScalarProperty Name="Send_SubmitResult" ColumnName="Send_SubmitResult" />
+                <ScalarProperty Name="Send_StartFlag" ColumnName="Send_StartFlag" />
+                <ScalarProperty Name="Send_IsOver" ColumnName="Send_IsOver" />
+                <ScalarProperty Name="Send_QuestionId" ColumnName="Send_QuestionId" />
+                <ScalarProperty Name="Send_CheckTime" ColumnName="Send_CheckTime" />
+                <ScalarProperty Name="Send_CheckId" ColumnName="Send_CheckId" />
+                <ScalarProperty Name="Send_CheckStatus" ColumnName="Send_CheckStatus" />
+                <ScalarProperty Name="Send_ReportDate" ColumnName="Send_ReportDate" />
+                <ScalarProperty Name="Send_ReplyIsTrue" ColumnName="Send_ReplyIsTrue" />
+                <ScalarProperty Name="Send_ApiID" ColumnName="Send_ApiID" />
+                <ScalarProperty Name="Send_Batch" ColumnName="Send_Batch" />
+                <ScalarProperty Name="Send_IsPersonalized" ColumnName="Send_IsPersonalized" />
+                <ScalarProperty Name="Send_DataStatus" ColumnName="Send_DataStatus" />
+                <ScalarProperty Name="Send_UpdateDate" ColumnName="Send_UpdateDate" />
+                <ScalarProperty Name="Send_UpdateId" ColumnName="Send_UpdateId" />
+                <ScalarProperty Name="Send_CreateTime" ColumnName="Send_CreateTime" />
+                <ScalarProperty Name="Send_CreateId" ColumnName="Send_CreateId" />
+                <ScalarProperty Name="Send_IsTD" ColumnName="Send_IsTD" />
+                <ScalarProperty Name="Send_ReplyTemplateId" ColumnName="Send_ReplyTemplateId" />
+                <ScalarProperty Name="Send_Test" ColumnName="Send_Test" />
+                <ScalarProperty Name="Send_SMSID" ColumnName="Send_SMSID" />
+                <ScalarProperty Name="Send_Flag" ColumnName="Send_Flag" />
+                <ScalarProperty Name="Send_Result" ColumnName="Send_Result" />
+                <ScalarProperty Name="Send_ReplyFlag" ColumnName="Send_ReplyFlag" />
+                <ScalarProperty Name="Send_ReplyId" ColumnName="Send_ReplyId" />
+                <ScalarProperty Name="Send_NeedReply" ColumnName="Send_NeedReply" />
+                <ScalarProperty Name="Send_AccountId" ColumnName="Send_AccountId" />
+                <ScalarProperty Name="Send_Status" ColumnName="Send_Status" />
+                <ScalarProperty Name="Send_Time" ColumnName="Send_Time" />
+                <ScalarProperty Name="Send_TextID" ColumnName="Send_TextID" />
+                <ScalarProperty Name="Send_Contents" ColumnName="Send_Contents" />
+                <ScalarProperty Name="Send_Mobile" ColumnName="Send_Mobile" />
+                <ScalarProperty Name="Send_Title" ColumnName="Send_Title" />
+                <ScalarProperty Name="Send_Id" ColumnName="Send_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TD_List">
+            <EntityTypeMapping TypeName="BFSMSDBModel.TD_List">
+              <MappingFragment StoreEntitySet="TD_List">
+                <ScalarProperty Name="Types" ColumnName="Types" />
+                <ScalarProperty Name="Dates" ColumnName="Dates" />
+                <ScalarProperty Name="Conetents" ColumnName="Conetents" />
+                <ScalarProperty Name="Mobile" ColumnName="Mobile" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
