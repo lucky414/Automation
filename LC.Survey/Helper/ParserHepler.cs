@@ -116,10 +116,10 @@ namespace LC.Survey.Helper
                         LogHelper.WriteLog(string.Format("{0}，重复", dr["phone_no"]));
                         continue;
                     }
-                    if (dr.IsNull("customer_name_shortened_chi") || !HttpHelper.IsDateTime(dr["Expired date"].ToString()))
+                    if (dr.IsNull("Expired date") || !HttpHelper.IsDateTime(dr["Expired date"].ToString()))
                     {
                         i++;
-                        LogHelper.WriteLog(string.Format("{0}，日期无效", dr["phone_no"]));
+                        LogHelper.WriteLog(string.Format("{0}，日期无效", dr["Expired date"]));
                         continue;
                     }
                     if (dr.IsNull("customer_name_shortened_chi") || string.IsNullOrWhiteSpace(dr["customer_name_shortened_chi"].ToString()))
@@ -231,6 +231,11 @@ namespace LC.Survey.Helper
             {
                 HttpHelper.SendEmailBy465("Post Purchase Survey Auto SMS Notification", "CSV文件中没有数据");
                 HttpHelper.SendSMS("CSV文件中没有数据");
+            }
+            else if (list.Data.Count == 0)
+            {
+                HttpHelper.SendEmailBy465("Post Purchase Survey Auto SMS Notification", "数据无效，请检查数据格式是否正确");
+                HttpHelper.SendSMS("数据无效，请检查数据格式是否正确");
             }
             else
             {
